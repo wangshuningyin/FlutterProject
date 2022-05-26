@@ -45,7 +45,7 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
                 borderRadius: BorderRadius.circular(2),
               ),
               child: Image.asset(
-                "imageName",
+                "lib/images/3.0x/light_open@3x.png",
                 fit: BoxFit.cover,
                 width: 40,
                 height: 40,
