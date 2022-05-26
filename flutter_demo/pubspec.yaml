@@ -127,6 +127,7 @@ flutter:
     - lib/images/3.0x/home_scan@3x.png
     - lib/images/3.0x/light_close@3x.png
     - lib/images/3.0x/light_open@3x.png
+    - lib/images/3.0x/abb_input@3x.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

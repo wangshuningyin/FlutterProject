@@ -26,8 +26,9 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
     super.reassemble();
     if (Platform.isAndroid) {
       controller!.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller!.resumeCamera();
     }
-    controller!.resumeCamera();
   }
 
   @override
@@ -71,7 +72,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
                     });
                   },
                   child: FutureBuilder(
-                    future: controller?.getFlashStatus(),
+                    // future: controller?.getFlashStatus(),
                     builder: (context, snapshot) {
                       return Image.asset(
                         imageName,
