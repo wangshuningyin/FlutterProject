@@ -33,14 +33,40 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      body: const Text(
-        'InputSNManuallyPage',
-        style: TextStyle(
-          fontSize: 20,
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      body: Builder(builder: (context) {
+        return Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 15),
+              height: 4,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(2),
+              ),
+              child: Image.asset(
+                "imageName",
+                fit: BoxFit.cover,
+                width: 40,
+                height: 40,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 20, bottom: 10),
+              width: MediaQuery.of(context).size.width,
+              child: const Text(
+                'InputSNManuallyPage',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              alignment: Alignment.center,
+            ),
+          ],
+        );
+      }),
     );
   }
 }
