@@ -85,7 +85,6 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
     }
     return () {
       _loadData();
-      print("点击了ok按钮");
     };
   }
 
