@@ -71,7 +71,9 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
       });
     });
   }
-
+  _loadData() {
+    print("网络请求");
+  }
   Function()? _saveAction() {
     print(thirdController.text);
     if (fristInputText.isEmpty ||
@@ -82,6 +84,7 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
       };
     }
     return () {
+      _loadData();
       print("点击了ok按钮");
     };
   }
