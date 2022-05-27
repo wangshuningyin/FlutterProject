@@ -82,12 +82,7 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
       };
     }
     return () {
-      // Navigator.pushNamed(
-      //   context,
-      //   Routes.modbusRtuPage,
-      //   arguments: widget.type,
-      // );
-      print("object");
+      print("点击了ok按钮");
     };
   }
 
