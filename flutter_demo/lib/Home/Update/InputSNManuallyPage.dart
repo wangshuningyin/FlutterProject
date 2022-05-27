@@ -24,7 +24,7 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
     if (Platform.isIOS) {}
     firstController.addListener(() {
       firstController.text.toUpperCase();
-      print(firstController.text);
+      print("dfdfdgfdg${firstController.text}");
       if (firstController.text.length > 7) {}
     });
   }
@@ -109,10 +109,10 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
                       onChanged: (value) {
                         ///禁止联想输入
                         if (firstController.text.length > 7) {
-                          inputText = firstController.text.substring(0,6);
+                          inputText = firstController.text.substring(0, 6);
                           firstController.value = TextEditingValue(
                               text: inputText.toUpperCase(),
-                              selection:  TextSelection.collapsed(
+                              selection: TextSelection.collapsed(
                                   offset: inputText.length));
                           return;
                         }
