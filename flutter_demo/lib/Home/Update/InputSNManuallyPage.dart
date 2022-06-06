@@ -1,6 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_demo/NetWorkApi/NetWorkApiRequest.dart';
+import 'package:flutter_demo/Utils/LoadingUtils.dart';
+import 'package:flutter_demo/Utils/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InputSNManuallyPage extends StatefulWidget {
   const InputSNManuallyPage({Key? key}) : super(key: key);
@@ -23,6 +28,15 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
   String selectedModelStr = '';
   Color btnBackgorondColor = Colors.grey.shade300;
   Color btnTextColor = Colors.black;
+  String sessionId = '';
+  Future<void> _getSessionId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      var sessionIdStr = prefs.getString('sessionId') ?? "";
+      sessionId = sessionIdStr;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -71,9 +85,7 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
       });
     });
   }
-  _loadData() {
-    print("网络请求");
-  }
+
   Function()? _saveAction() {
     print(thirdController.text);
     if (fristInputText.isEmpty ||
@@ -84,8 +96,44 @@ class _InputSNManuallyPageState extends State<InputSNManuallyPage> {
       };
     }
     return () {
-      _loadData();
+      _getSessionId().then((value) {
+        _getDevice('$fristInputText$secondInputText$thridInputText');
+      });
     };
+  }
+
+  _getDevice(String code) {
+    print("====$sessionId ====$code");
+    Map<String, String> parameter = {"deviceNumber": code};
+
+    NetWorkApiRequest.getDevice(sessionId, parameter).then((value) async {
+      if (value != null && value['code'] == 0) {
+        setState(() {
+          String str = json.encode(value);
+          print(str);
+          // var ocppServerModel = ocppServerListModelFromJson(str);
+          // for (var item in ocppServerModel.data.list) {
+          //   item.isSelected = true;
+          //   dataList.add(item);
+          // }
+          // for (int i = 0; i < ocppServerModel.data.list.length; i++) {
+          //   widgets.add(getRow(i));
+          // }
+          Navigator.pushNamed(
+            context,
+            Routes.packageEditPage,
+            arguments: {
+              "type": 'type',
+            },
+          );
+        });
+      } else {
+        LoadingUtils.showToast(value['msg']);
+      }
+    }).catchError((e) {
+      //失败
+      LoadingUtils.showToast(e.toString());
+    });
   }
 
   Widget textEditingWidget(

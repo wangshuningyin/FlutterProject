@@ -29,4 +29,10 @@ class NetWorkApiRequest {
     return await DioManager(str).post('api/v3/device/device/update',
         data: parameter, parameters: parameter);
   }
+
+  ///获取设备信息
+  static getDevice(String str, Map<String, dynamic> parameter) async {
+    return await DioManager(str).post('api/v3/device/device/info',
+        data: parameter, parameters: parameter);
+  }
 }

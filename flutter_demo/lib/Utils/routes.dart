@@ -20,4 +20,5 @@ class Routes {
   static const String updatePage = '/UpdatePage';
   static const String qRViewExample = '/QRViewExample';
   static const String inputSNManuallyPage = '/InputSNManuallyPage';
+  static const String packageEditPage = '/PackageEditPage';
 }

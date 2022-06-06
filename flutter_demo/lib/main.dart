@@ -7,6 +7,7 @@ import 'package:flutter_demo/Home/FirmwareInfo/FirmwareInfoPage.dart';
 import 'package:flutter_demo/Home/OCPPServer/Page/OCPPServerConfigurePage.dart';
 import 'package:flutter_demo/Home/Settings/SetGeneralParameterPage.dart';
 import 'package:flutter_demo/Home/Update/InputSNManuallyPage.dart';
+import 'package:flutter_demo/Home/Update/PackageEditPage.dart';
 import 'package:flutter_demo/Home/Update/QrCodeScanner.dart';
 import 'package:flutter_demo/Home/Update/UpdatePage.dart';
 import 'package:flutter_demo/Main/IndexPage.dart';
@@ -81,6 +82,8 @@ class _MyAppState extends State<MyApp> {
     Routes.qRViewExample: (BuildContext context) => const QrCodeScanner(),
     Routes.inputSNManuallyPage: (BuildContext context) =>
         const InputSNManuallyPage(),
+    Routes.packageEditPage: (BuildContext context, {arguments}) =>
+        PackageEditPage(type: arguments),
   };
   @override
   void initState() {

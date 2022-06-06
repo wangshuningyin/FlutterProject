@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/Utils/LoadingUtils.dart';
 import 'package:flutter_demo/Utils/routes.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:flutter_demo/NetWorkApi/NetWorkApiRequest.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QrCodeScanner extends StatefulWidget {
   const QrCodeScanner({Key? key}) : super(key: key);
@@ -19,6 +23,15 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
   static const String lightOpen = "lib/images/3.0x/light_open@3x.png";
   static const String lightColse = "lib/images/3.0x/light_close@3x.png";
   String imageName = lightColse;
+  String sessionId = '';
+  Future<void> _getSessionId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      var sessionIdStr = prefs.getString('sessionId') ?? "";
+      sessionId = sessionIdStr;
+    });
+  }
+
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
@@ -29,6 +42,42 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
     } else if (Platform.isIOS) {
       controller!.resumeCamera();
     }
+  }
+
+  _getDevice(String code) {
+    print("====$sessionId ====$code");
+    Map<String, String> parameter = {"deviceNumber": code};
+
+    NetWorkApiRequest.getDevice(sessionId, parameter).then((value) async {
+      if (value != null && value['code'] == 0) {
+        setState(() {
+          String str = json.encode(value);
+          print(str);
+          Navigator.pushNamed(
+            context,
+            Routes.packageEditPage,
+            arguments: {
+              "type": 'type',
+            },
+          );
+          // var ocppServerModel = ocppServerListModelFromJson(str);
+          // for (var item in ocppServerModel.data.list) {
+          //   item.isSelected = true;
+          //   dataList.add(item);
+          // }
+          // for (int i = 0; i < ocppServerModel.data.list.length; i++) {
+          //   widgets.add(getRow(i));
+          // }
+        });
+      } else {
+        LoadingUtils.showToast(value['msg']);
+        controller!.resumeCamera();
+      }
+    }).catchError((e) {
+      //失败
+      LoadingUtils.showToast(e.toString());
+      controller!.resumeCamera();
+    });
   }
 
   @override
@@ -153,7 +202,13 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
     });
     controller.scannedDataStream.listen((scanData) {
       setState(() {
-        result = scanData;
+        if (scanData.code != null) {
+          _getSessionId().then((value) {
+            controller.pauseCamera();
+            _getDevice(scanData.code!);
+            print('扫描成功');
+          });
+        }
       });
     });
   }
