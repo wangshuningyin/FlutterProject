@@ -15,8 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String version = '';
-  bool isConnectBluetooth = false;
-  bool isDisconnect = false;
+  bool isSelectedDevice = false;
   Color connectColor = Colors.black;
   String manualConnection = '';
   String connectionStr = '';
@@ -29,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   String connectState = "Connect Charger";
   String deviceName = "";
   final callBluetoothSDK = CallBluetoothSDK();
+
   Future<void> callstartConnectPeripheral(String item) async {
     callBluetoothSDK.startConnectPeripheral();
     delayedConnectPeripheral(item);
@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
     Future.delayed(const Duration(milliseconds: 5000), () {
       print("延时5秒执行");
       callIsConnectPeripheralSuccess(item);
-      return Future.value("测试数据");
+      return Future.value("延时5秒执行");
     });
   }
 
@@ -47,25 +47,20 @@ class _HomePageState extends State<HomePage> {
     final res = await callBluetoothSDK.isConnectPeripheralSuccess();
     isConnectPeripheralSuccess = res;
     print('Flutter3------蓝牙设备连接成功$isConnectPeripheralSuccess');
-
-    if (isConnectPeripheralSuccess == false) {
-      setState(() {
-        isConnectBluetooth = false;
-        isDisconnect = true;
-      });
-    } else {
-      setState(() {
-        isDisconnect = false;
-        isConnectBluetooth = true;
-      });
-    }
+    setState(() {
+      _connectState(isConnectPeripheralSuccess);
+    });
     return res;
   }
 
   Future<void> callStartBluetooth() async {
-    if (isDisconnect == false) {
+    callBluetoothSDK.startBluetooth();
+  }
+
+  _connectState(bool isConnect) {
+    if (isConnect) {
       connectColor = Colors.green;
-      connectionStr = 'Connected';
+      connectionStr = "Connected";
       manualConnection = 'Disconnect';
       bleImageStr = 'lib/images/3.0x/home_ble_select@3x.png';
       wifiImageStr = 'lib/images/3.0x/home_wifi_select@3x.png';
@@ -74,7 +69,6 @@ class _HomePageState extends State<HomePage> {
       connectImageStr = 'lib/images/3.0x/home_disconnect@3x.png';
     } else {
       connectColor = Colors.black;
-      connectionStr = 'Connection Lost';
       manualConnection = 'Reconnect';
       bleImageStr = 'lib/images/3.0x/home_ble@3x.png';
       wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
@@ -82,7 +76,6 @@ class _HomePageState extends State<HomePage> {
       fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
       connectImageStr = 'lib/images/3.0x/home_reconnect@3x.png';
     }
-    callBluetoothSDK.startBluetooth();
   }
 
   @override
@@ -356,8 +349,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Row(
                         children: <Widget>[
-                          Text("Switch Charge"),
-                          SizedBox(width: 10),
+                          const Text("Switch Charge"),
+                          const SizedBox(width: 10),
                           IconButton(
                             icon: Image.asset(
                               'lib/images/3.0x/home_switch@3x.png',
@@ -368,7 +361,7 @@ class _HomePageState extends State<HomePage> {
                             tooltip: 'Increase volume by 10',
                             onPressed: () {
                               setState(() {
-                                isConnectBluetooth = false;
+                                isConnectPeripheralSuccess = false;
                                 _navigateAndDisplaySelection(context);
                               });
                             },
@@ -438,7 +431,8 @@ class _HomePageState extends State<HomePage> {
                             tooltip: 'Increase volume by 10',
                             onPressed: () {
                               setState(() {
-                                isDisconnect = !isDisconnect;
+                                isConnectPeripheralSuccess =
+                                    !isConnectPeripheralSuccess;
                               });
                             },
                           ),
@@ -490,11 +484,11 @@ class _HomePageState extends State<HomePage> {
                       renderTitle("Charger Paring"),
                       // 视觉上隐藏小部件  _offstage 为真即隐藏
                       Offstage(
-                        offstage: isConnectBluetooth,
+                        offstage: isSelectedDevice,
                         child: headerbuild("title", context),
                       ),
                       Offstage(
-                        offstage: !isConnectBluetooth,
+                        offstage: !isSelectedDevice,
                         child: connectbuild(context),
                       ),
                       renderTitle("Self Detect"),
@@ -537,14 +531,16 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (context) => const DeviceListPage()),
     );
     setState(() {
-      // update the text
       if (result == null) {
         connectState = "Connect Charger";
         deviceName = "";
+        isSelectedDevice = false;
       } else {
         callstartConnectPeripheral(result);
-        connectState = "Connecting...";
         deviceName = result.toString();
+        isSelectedDevice = true;
+        connectionStr = "Connecting...";
+        _connectState(isConnectPeripheralSuccess);
       }
     });
   }

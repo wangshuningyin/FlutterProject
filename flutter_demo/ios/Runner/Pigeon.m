@@ -134,24 +134,6 @@ void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObje
   {
     FlutterBasicMessageChannel *channel =
       [FlutterBasicMessageChannel
-        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.isConnectPeripheralSuccess"
-        binaryMessenger:binaryMessenger
-        codec:FLTCallBluetoothSDKGetCodec()];
-    if (api) {
-      NSCAssert([api respondsToSelector:@selector(isConnectPeripheralSuccessWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(isConnectPeripheralSuccessWithCompletion:)", api);
-      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
-        [api isConnectPeripheralSuccessWithCompletion:^(NSNumber *_Nullable output, FlutterError *_Nullable error) {
-          callback(wrapResult(output, error));
-        }];
-      }];
-    }
-    else {
-      [channel setMessageHandler:nil];
-    }
-  }
-  {
-    FlutterBasicMessageChannel *channel =
-      [FlutterBasicMessageChannel
         messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.startBluetooth"
         binaryMessenger:binaryMessenger
         codec:FLTCallBluetoothSDKGetCodec()];
@@ -206,14 +188,14 @@ void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObje
   {
     FlutterBasicMessageChannel *channel =
       [FlutterBasicMessageChannel
-        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.stopConnectPeripheral"
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.isConnectPeripheralSuccess"
         binaryMessenger:binaryMessenger
         codec:FLTCallBluetoothSDKGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(stopConnectPeripheralWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(stopConnectPeripheralWithCompletion:)", api);
+      NSCAssert([api respondsToSelector:@selector(isConnectPeripheralSuccessWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(isConnectPeripheralSuccessWithCompletion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
-        [api stopConnectPeripheralWithCompletion:^(FlutterError *_Nullable error) {
-          callback(wrapResult(nil, error));
+        [api isConnectPeripheralSuccessWithCompletion:^(NSNumber *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
         }];
       }];
     }
@@ -234,6 +216,42 @@ void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObje
         NSString *arg_name = args[0];
         [api getConnectDeviceNameName:arg_name completion:^(FlutterError *_Nullable error) {
           callback(wrapResult(nil, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.stopConnectPeripheral"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(stopConnectPeripheralWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(stopConnectPeripheralWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api stopConnectPeripheralWithCompletion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.isDisConnectPeripheralSuccess"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(isDisConnectPeripheralSuccessWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(isDisConnectPeripheralSuccessWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api isDisConnectPeripheralSuccessWithCompletion:^(NSNumber *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
         }];
       }];
     }

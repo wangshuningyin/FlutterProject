@@ -13,8 +13,7 @@ abstract class CallBluetoothSDK {
   List<String?> getDeviceNames();
   // @async
   // List<Map?> getCBPeripherals();
-  @async
-  bool isConnectPeripheralSuccess();
+
   @async
   void startBluetooth();
   @async
@@ -22,9 +21,13 @@ abstract class CallBluetoothSDK {
   @async
   void startConnectPeripheral();
   @async
-  void stopConnectPeripheral();
+  bool isConnectPeripheralSuccess();
   @async
   void getConnectDeviceName(String name);
+  @async
+  void stopConnectPeripheral();
+  @async
+  bool isDisConnectPeripheralSuccess();
   @async
   void queryEnableConfig();
   @async

@@ -52,7 +52,7 @@
 }
 
 - (void)stopConnectPeripheralWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
-//    [[CDBleManager shareManager] stopConnectPeripheral:self.peripheral error:nil];
+    [[CDBleManager shareManager] stopConnectPeripheral:self.connectPeripheral error:nil];
 }
 
 - (void)isConnectPeripheralSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
@@ -110,6 +110,13 @@
     NSLog(@"二维码扫描");
 }
 
+- (void)isDisConnectPeripheralSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
+    NSNumber* boolNum = [NSNumber numberWithBool:self.isDisConnectPeripheralSuccess];
+    completion(boolNum,nil);
+    NSLog(@"iOS4 boolNum=%@ ----isConnectPeripheralSuccess = %d",boolNum,self.isDisConnectPeripheralSuccess);
+}
+
+
 
 #pragma mark -- CDBleManagerDelegate
 - (void)cdbleManagerCenterState:(CBManagerState)state{
@@ -147,8 +154,9 @@
     }
     if (dataModel.result.resultType == CDBleSetResultTypeSuccess) {
         CDBleSetResult *result = dataModel.result;
-        if (result.resultType == CDBleSetResultTypeSuccess) { //
+        if (result.resultType == CDBleSetResultTypeSuccess) {
             self.isConnectPeripheralSuccess = YES;
+            self.isDisConnectPeripheralSuccess = YES;
             NSLog(@"数据请求成功");
         }
         if (dataModel.cmdType == CDBleCmdTypeDeviceEnableConfig) { //配置free vending使能

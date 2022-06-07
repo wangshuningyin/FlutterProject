@@ -26,17 +26,19 @@ NSObject<FlutterMessageCodec> *FLTCallBluetoothSDKGetCodec(void);
 /// @return `nil` only when `error != nil`.
 - (void)getDeviceNamesWithCompletion:(void(^)(NSArray<NSString *> *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
-- (void)isConnectPeripheralSuccessWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
-/// @return `nil` only when `error != nil`.
 - (void)startBluetoothWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)scanForPeripheralsWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)startConnectPeripheralWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
-- (void)stopConnectPeripheralWithCompletion:(void(^)(FlutterError *_Nullable))completion;
+- (void)isConnectPeripheralSuccessWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)getConnectDeviceNameName:(nullable NSString *)name completion:(void(^)(FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)stopConnectPeripheralWithCompletion:(void(^)(FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)isDisConnectPeripheralSuccessWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)queryEnableConfigWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
