@@ -14,50 +14,23 @@ class _DeviceListPage extends State<DeviceListPage> {
   //定义一个变量，在页面销毁时需要用到，如果在定时器内部已经销毁了，可以不需要
   late Timer _timer;
   List<String?> deviceNameList = [];
-  bool isConnectPeripheralSuccess = false;
-  String str = '';
+
+  final callBluetoothSDK = CallBluetoothSDK();
   Future<List<String?>> callDeviceName() async {
-    final deviceNameApi = CallBluetoothSDK();
-    final deviceNames = await deviceNameApi.getDeviceNames();
+    final deviceNames = await callBluetoothSDK.getDeviceNames();
     return deviceNames;
   }
 
-  void delayedConnectPeripheral(String item) {
-    Future.delayed(const Duration(milliseconds: 6000), () {
-      print("延时6秒执行");
-      callIsConnectPeripheralSuccess(item);
-      return Future.value("测试数据");
-    });
-  }
-
-  Future<bool?> callIsConnectPeripheralSuccess(String item) async {
-    final api = CallBluetoothSDK();
-    final res = await api.isConnectPeripheralSuccess();
-    isConnectPeripheralSuccess = res;
-    str = '$item,$isConnectPeripheralSuccess';
-    print('Flutter3------蓝牙设备连接成功$str');
-    Navigator.pop(context, str);
-    return res;
-  }
-
   Future<void> getDeviceName(String item) async {
-    final api = CallBluetoothSDK();
-    api.getConnectDeviceName(item);
+    callBluetoothSDK.getConnectDeviceName(item);
+    Navigator.pop(context, item);
     print('Flutter1------连接的蓝牙设备名称$item');
-    callstartConnectPeripheral(item);
-  }
-
-  Future<void> callstartConnectPeripheral(String item) async {
-    final scanForPeripherals = CallBluetoothSDK();
-    scanForPeripherals.startConnectPeripheral();
-    delayedConnectPeripheral(item);
-    print('Flutter2------开始连接蓝牙设备');
   }
 
   myTimer() {
     // 定义一个函数，将定时器包裹起来
     _timer = Timer.periodic(const Duration(milliseconds: 2000), (t) {
-      CallBluetoothSDK().scanForPeripherals();
+      callBluetoothSDK.scanForPeripherals();
       callDeviceName().then((value) => setState(() {
             deviceNameList = value;
           }));
@@ -66,6 +39,7 @@ class _DeviceListPage extends State<DeviceListPage> {
 
   @override
   void initState() {
+    deviceNameList.clear();
     super.initState();
     if (Platform.isIOS) {
       myTimer();

@@ -6,7 +6,6 @@
 //
 
 #import "PigeonService.h"
-#import "YErWeiMaController.h"
 
 @implementation PigeonService
 
@@ -85,24 +84,30 @@
     }];
 }
 
+/**
+ * 查询配置使能 DD
+ */
+- (void)queryEnableConfigRFID{
+    [[CDBleManager shareManager] queryEnableConfigWithError:^(NSError * _Nullable error) {
+    }];
+}
+/**
+ * 配置设置使能 DC
+ * params: 只使用 1 字节,只传入 1 个字节 8 bit 数据
+ */
+-(void)enableConfig{
+    [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
+       
+    }];
+}
+
 - (void)getEnableWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
     NSNumber* isEnable = [NSNumber numberWithBool:self.isEnable];
     completion(isEnable,nil);
 }
 
 - (void)scanQRCodeWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
-//    NSLog(@"二维码 扫描");
-    
-    UIViewController *topRootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (topRootViewController.presentedViewController)
-    {
-    topRootViewController = topRootViewController.presentedViewController;
-    }
-    YErWeiMaController *loginVC = [YErWeiMaController new];
-//    UINavigationController *navc = [[UINavigationController alloc] initWithRootViewController:loginVC];
-//    [topRootViewController presentViewController:loginVC animated:YES completion:nil];
-//    self.vc = loginVC;
-    [topRootViewController.navigationController pushViewController:loginVC animated:YES];
+    NSLog(@"二维码扫描");
 }
 
 
@@ -127,7 +132,6 @@
 /// @brief 已经连接到外设
 /// @param peripheral 已连接的外设
 -(void)cdbleManager:(CDBleManager *)cdbleManager didConnectPeripheral:(CBPeripheral *)peripheral {
-    self.isConnectPeripheralSuccess = YES;
     NSLog(@"iOS3 连接成功的蓝牙设备 = %@ ---- 是否成功isConnectPeripheralSuccess = %d",peripheral, self.isConnectPeripheralSuccess);
 }
 
@@ -141,9 +145,12 @@
         NSLog(@"设备不支持");
         return;
     }
-    if (dataModel.result == CDBleSetResultTypeSuccess) {
+    if (dataModel.result.resultType == CDBleSetResultTypeSuccess) {
         CDBleSetResult *result = dataModel.result;
-        NSLog(@"%ld",(long)result);
+        if (result.resultType == CDBleSetResultTypeSuccess) { //
+            self.isConnectPeripheralSuccess = YES;
+            NSLog(@"数据请求成功");
+        }
         if (dataModel.cmdType == CDBleCmdTypeDeviceEnableConfig) { //配置free vending使能
             NSLog(@"free vending使能配置成功");
         } else if (dataModel.cmdType == CDBleCmdTypeQueryDeviceEnable) {//查询free vending使能配置
@@ -164,20 +171,5 @@
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
-/**
- * 查询配置使能 DD
- */
-- (void)queryEnableConfigRFID{
-    [[CDBleManager shareManager] queryEnableConfigWithError:^(NSError * _Nullable error) {
-    }];
-}
-/**
- * 配置设置使能 DC
- * params: 只使用 1 字节,只传入 1 个字节 8 bit 数据
- */
--(void)enableConfig{
-    [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
-       
-    }];
-}
+
 @end

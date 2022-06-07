@@ -25,6 +25,42 @@ class _HomePageState extends State<HomePage> {
   String lanImageStr = 'lib/images/3.0x/home_lan_select@3x.png';
   String fourGImageStr = 'lib/images/3.0x/home_4g_select@3x.png';
   String connectImageStr = 'lib/images/3.0x/home_disconnect@3x.png';
+  bool isConnectPeripheralSuccess = false;
+  String connectState = "Connect Charger";
+  String deviceName = "";
+  final callBluetoothSDK = CallBluetoothSDK();
+  Future<void> callstartConnectPeripheral(String item) async {
+    callBluetoothSDK.startConnectPeripheral();
+    delayedConnectPeripheral(item);
+    print('Flutter2------开始连接蓝牙设备');
+  }
+
+  void delayedConnectPeripheral(String item) {
+    Future.delayed(const Duration(milliseconds: 5000), () {
+      print("延时5秒执行");
+      callIsConnectPeripheralSuccess(item);
+      return Future.value("测试数据");
+    });
+  }
+
+  Future<bool?> callIsConnectPeripheralSuccess(String item) async {
+    final res = await callBluetoothSDK.isConnectPeripheralSuccess();
+    isConnectPeripheralSuccess = res;
+    print('Flutter3------蓝牙设备连接成功$isConnectPeripheralSuccess');
+
+    if (isConnectPeripheralSuccess == false) {
+      setState(() {
+        isConnectBluetooth = false;
+        isDisconnect = true;
+      });
+    } else {
+      setState(() {
+        isDisconnect = false;
+        isConnectBluetooth = true;
+      });
+    }
+    return res;
+  }
 
   Future<void> callStartBluetooth() async {
     if (isDisconnect == false) {
@@ -46,8 +82,7 @@ class _HomePageState extends State<HomePage> {
       fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
       connectImageStr = 'lib/images/3.0x/home_reconnect@3x.png';
     }
-    final startBluetooth = CallBluetoothSDK();
-    startBluetooth.startBluetooth();
+    callBluetoothSDK.startBluetooth();
   }
 
   @override
@@ -240,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                           height: 40,
                           width: 180,
                           child: Text(
-                            textToShow,
+                            connectState,
                             style: const TextStyle(
                               color: Colors.red,
                               fontSize: 18,
@@ -426,7 +461,7 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(
                       height: 6,
                     ),
-                    Text(textToShow),
+                    Text(deviceName),
                   ],
                 ),
               ],
@@ -496,7 +531,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  String textToShow = "Connect Charger";
   void _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Navigator.push(
       context,
@@ -505,18 +539,12 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       // update the text
       if (result == null) {
-        textToShow = "Connect Charger";
+        connectState = "Connect Charger";
+        deviceName = "";
       } else {
-        List<String?> arrStr = result.split(",");
-        String s = arrStr[1].toString();
-        textToShow = arrStr[0].toString();
-        if (s == 'fase') {
-          isConnectBluetooth = false;
-          isDisconnect = true;
-        } else {
-          isDisconnect = false;
-          isConnectBluetooth = true;
-        }
+        callstartConnectPeripheral(result);
+        connectState = "Connecting...";
+        deviceName = result.toString();
       }
     });
   }
