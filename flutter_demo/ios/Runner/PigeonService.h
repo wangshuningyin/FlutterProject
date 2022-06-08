@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong)NSMutableArray *nameDic;
 @property(nonatomic, assign)BOOL isConnectPeripheralSuccess;
 @property(nonatomic, assign)BOOL isDisConnectPeripheralSuccess;
+@property(nonatomic, assign)BOOL isConnectedPeripheral;
 @property(nonatomic, copy )NSString *enableConfigBinaryStr;
 @property(nonatomic, assign)BOOL isEnable;
 @property (nonatomic, strong) UIViewController *vc;

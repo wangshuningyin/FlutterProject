@@ -116,6 +116,17 @@
     NSLog(@"iOS4 boolNum=%@ ----isConnectPeripheralSuccess = %d",boolNum,self.isDisConnectPeripheralSuccess);
 }
 
+- (void)isConnectedPeripheralWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
+    NSLog(@"%@", [CDBleManager shareManager].connectedPheral);
+    if ([CDBleManager shareManager].connectedPheral == nil) {
+        self.isConnectedPeripheral = NO;
+    }else{
+        self.isConnectedPeripheral = YES;
+    }
+    NSNumber* boolNum = [NSNumber numberWithBool:self.isConnectedPeripheral];
+    completion(boolNum,nil);
+    NSLog(@"是否连接设备 boolNum=%@ ----isConnectedPeripheral = %d",boolNum,self.isConnectedPeripheral);
+}
 
 
 #pragma mark -- CDBleManagerDelegate

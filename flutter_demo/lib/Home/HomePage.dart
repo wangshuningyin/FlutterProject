@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   String connectState = "Connect Charger";
   String deviceName = "";
   final callBluetoothSDK = CallBluetoothSDK();
+  bool isSelected = false;
 
   Future<void> callstartConnectPeripheral(String item) async {
     callBluetoothSDK.startConnectPeripheral();
@@ -36,10 +37,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void delayedConnectPeripheral(String item) {
-    Future.delayed(const Duration(milliseconds: 5000), () {
-      print("延时5秒执行");
+    Future.delayed(const Duration(milliseconds: 4000), () {
+      print("延时4秒执行");
       callIsConnectPeripheralSuccess(item);
-      return Future.value("延时5秒执行");
+      return Future.value("延时4秒执行");
     });
   }
 
@@ -57,6 +58,51 @@ class _HomePageState extends State<HomePage> {
     callBluetoothSDK.startBluetooth();
   }
 
+  Future<void> callStopConnectPeripheral(
+      String item, bool isGoToNextPage) async {
+    callBluetoothSDK.stopConnectPeripheral();
+    delayedStopConnectPeripheral(item, isGoToNextPage);
+    print('Flutter2------开始连接蓝牙设备');
+  }
+
+  void delayedStopConnectPeripheral(String item, bool isGoToNextPage) {
+    callIsDisConnectPeripheralSuccess(item, isGoToNextPage);
+  }
+
+  Future<bool?> callIsDisConnectPeripheralSuccess(
+      String item, bool isGoToNextPage) async {
+    final res = await callBluetoothSDK.isDisConnectPeripheralSuccess();
+    if (isGoToNextPage) {
+      isConnectPeripheralSuccess = false;
+      _navigateAndDisplaySelection(context);
+    }
+    return res;
+  }
+
+  Future<bool?> callIsConnectPeripheral() async {
+    final res = await callBluetoothSDK.isConnectedPeripheral();
+    return res;
+  }
+
+  _clickAction() {
+    setState(() {
+      isSelected = !isSelected;
+      if (isSelected) {
+        print('Flutter2------开始断开蓝牙设备');
+        connectionStr = "Connection Lost";
+        manualConnection = 'Reconnect';
+        callStopConnectPeripheral(deviceName, false);
+        _connectState(!isSelected);
+      } else {
+        print('Flutter2------开始连接蓝牙设备');
+        callstartConnectPeripheral(deviceName);
+        connectionStr = "Connecting...";
+        manualConnection = 'Reconnect';
+        // _connectState(!isSelected);
+      }
+    });
+  }
+
   _connectState(bool isConnect) {
     if (isConnect) {
       connectColor = Colors.green;
@@ -69,7 +115,6 @@ class _HomePageState extends State<HomePage> {
       connectImageStr = 'lib/images/3.0x/home_disconnect@3x.png';
     } else {
       connectColor = Colors.black;
-      manualConnection = 'Reconnect';
       bleImageStr = 'lib/images/3.0x/home_ble@3x.png';
       wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
       lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
@@ -132,29 +177,38 @@ class _HomePageState extends State<HomePage> {
       list.add(
         GestureDetector(
           onTap: () {
-            if (i == 0) {
-              _deviceSync();
-            } else if (i == 1) {
-              Navigator.pushNamed(context, Routes.firmwareInfoPage);
-            } else if (i == 2) {
-              Navigator.pushNamed(context, Routes.deviceInfoPage);
-            } else if (i == 3) {
-              Navigator.pushNamed(context, Routes.updatePage);
-            } else if (i == 4) {
-              Navigator.pushNamed(context, Routes.chargerLinkPage);
-            } else if (i == 5) {
-              Navigator.pushNamed(context, Routes.ocppServerPage);
-            } else if (i == 6) {
-              Navigator.pushNamed(context, Routes.setGeneralParameterPage);
-            } else if (i == 7) {
-              Navigator.pushNamed(context, Routes.cardConfigurePage);
-            } else if (i == 8) {
-              Navigator.pushNamed(context, Routes.deviceMode);
-            } else if (i == 9) {
-              Navigator.pushNamed(context, Routes.modbusModePage);
-            } else {
-              LoadingUtils.showToast("正在开发。。。。。。");
-            }
+            callIsConnectPeripheral().then((value) => {
+                  if (value == false)
+                    {LoadingUtils.showToast("Please connect the device first")}
+                  else
+                    {
+                      if (i == 0)
+                        {_deviceSync()}
+                      else if (i == 1)
+                        {Navigator.pushNamed(context, Routes.firmwareInfoPage)}
+                      else if (i == 2)
+                        {Navigator.pushNamed(context, Routes.deviceInfoPage)}
+                      else if (i == 3)
+                        {Navigator.pushNamed(context, Routes.updatePage)}
+                      else if (i == 4)
+                        {Navigator.pushNamed(context, Routes.chargerLinkPage)}
+                      else if (i == 5)
+                        {Navigator.pushNamed(context, Routes.ocppServerPage)}
+                      else if (i == 6)
+                        {
+                          Navigator.pushNamed(
+                              context, Routes.setGeneralParameterPage)
+                        }
+                      else if (i == 7)
+                        {Navigator.pushNamed(context, Routes.cardConfigurePage)}
+                      else if (i == 8)
+                        {Navigator.pushNamed(context, Routes.deviceMode)}
+                      else if (i == 9)
+                        {Navigator.pushNamed(context, Routes.modbusModePage)}
+                      else
+                        {LoadingUtils.showToast("正在开发。。。。。。")}
+                    }
+                });
           },
           child: Container(
             alignment: Alignment.center,
@@ -260,7 +314,8 @@ class _HomePageState extends State<HomePage> {
                         //设置点击事件回调
                         // onTap: () => callScanForPeripherals(),
                         onTap: () {
-                          _navigateAndDisplaySelection(context);
+                          isConnectPeripheralSuccess = false;
+                          callStopConnectPeripheral(deviceName, true);
                         },
                         child: Container(
                           //设置 child 居中
@@ -321,18 +376,6 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Container(
         margin: const EdgeInsets.only(left: 10, top: 0, right: 10),
-        // height: 220,
-        // width:,
-        // decoration: BoxDecoration(
-        // color: Colors.red,
-        // border: Border.all(
-        //   width: 2,
-        //   color: const Color(0xFFEEEEEE),
-        // ),
-        // borderRadius: const BorderRadius.all(
-        //   const Radius.circular(8.0),
-        // ),
-        // ),
         child: Column(
           children: [
             Row(
@@ -358,12 +401,8 @@ class _HomePageState extends State<HomePage> {
                               width: 32,
                               height: 32,
                             ),
-                            tooltip: 'Increase volume by 10',
                             onPressed: () {
-                              setState(() {
-                                isConnectPeripheralSuccess = false;
-                                _navigateAndDisplaySelection(context);
-                              });
+                              callStopConnectPeripheral(deviceName, true);
                             },
                           ),
                         ],
@@ -428,12 +467,8 @@ class _HomePageState extends State<HomePage> {
                               width: 32,
                               height: 32,
                             ),
-                            tooltip: 'Increase volume by 10',
                             onPressed: () {
-                              setState(() {
-                                isConnectPeripheralSuccess =
-                                    !isConnectPeripheralSuccess;
-                              });
+                              _clickAction();
                             },
                           ),
                         ],
@@ -540,6 +575,7 @@ class _HomePageState extends State<HomePage> {
         deviceName = result.toString();
         isSelectedDevice = true;
         connectionStr = "Connecting...";
+        manualConnection = 'Reconnect';
         _connectState(isConnectPeripheralSuccess);
       }
     });

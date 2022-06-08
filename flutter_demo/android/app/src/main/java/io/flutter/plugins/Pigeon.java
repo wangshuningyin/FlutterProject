@@ -88,6 +88,7 @@ public class Pigeon {
     void getConnectDeviceName(String name, Result<Void> result);
     void stopConnectPeripheral(Result<Void> result);
     void isDisConnectPeripheralSuccess(Result<Boolean> result);
+    void isConnectedPeripheral(Result<Boolean> result);
     void queryEnableConfig(Result<Void> result);
     void getEnable(Result<Boolean> result);
     void enableConfig(Result<Void> result);
@@ -327,6 +328,35 @@ public class Pigeon {
               };
 
               api.isDisConnectPeripheralSuccess(resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.isConnectedPeripheral", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<Boolean> resultCallback = new Result<Boolean>() {
+                public void success(Boolean result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.isConnectedPeripheral(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

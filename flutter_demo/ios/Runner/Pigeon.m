@@ -262,6 +262,24 @@ void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObje
   {
     FlutterBasicMessageChannel *channel =
       [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.isConnectedPeripheral"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(isConnectedPeripheralWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(isConnectedPeripheralWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api isConnectedPeripheralWithCompletion:^(NSNumber *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
         messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.queryEnableConfig"
         binaryMessenger:binaryMessenger
         codec:FLTCallBluetoothSDKGetCodec()];

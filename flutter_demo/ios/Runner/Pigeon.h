@@ -40,6 +40,8 @@ NSObject<FlutterMessageCodec> *FLTCallBluetoothSDKGetCodec(void);
 /// @return `nil` only when `error != nil`.
 - (void)isDisConnectPeripheralSuccessWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
+- (void)isConnectedPeripheralWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
 - (void)queryEnableConfigWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)getEnableWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;

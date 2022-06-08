@@ -11,9 +11,6 @@ abstract class Api {
 abstract class CallBluetoothSDK {
   @async
   List<String?> getDeviceNames();
-  // @async
-  // List<Map?> getCBPeripherals();
-
   @async
   void startBluetooth();
   @async
@@ -28,6 +25,8 @@ abstract class CallBluetoothSDK {
   void stopConnectPeripheral();
   @async
   bool isDisConnectPeripheralSuccess();
+  @async
+  bool isConnectedPeripheral();
   @async
   void queryEnableConfig();
   @async
