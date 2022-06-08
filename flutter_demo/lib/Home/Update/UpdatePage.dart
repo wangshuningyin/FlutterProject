@@ -18,6 +18,7 @@ class _UpdatePageState extends State<UpdatePage> {
   @override
   void initState() {
     super.initState();
+    print("执行顺序");
   }
 
   //扫描二维码
