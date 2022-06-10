@@ -23,6 +23,13 @@
     return _names;
 }
 
+- (NSMutableArray *)systemInfoList {
+    if (_systemInfoList == nil) {
+        _systemInfoList = [NSMutableArray array];
+    }
+    return _systemInfoList;
+}
+
 #pragma mark -- FLTApi
 - (void)getPlatformVersionWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
     NSString *str = [[UIDevice currentDevice] systemVersion];
@@ -80,24 +87,6 @@
 - (void)enableConfigWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
     NSLog(@"iOS------free vending使能配置成功");
     [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
-       
-    }];
-}
-
-/**
- * 查询配置使能 DD
- */
-- (void)queryEnableConfigRFID{
-    [[CDBleManager shareManager] queryEnableConfigWithError:^(NSError * _Nullable error) {
-    }];
-}
-/**
- * 配置设置使能 DC
- * params: 只使用 1 字节,只传入 1 个字节 8 bit 数据
- */
--(void)enableConfig{
-    [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
-       
     }];
 }
 
@@ -128,6 +117,16 @@
     NSLog(@"是否连接设备 boolNum=%@ ----isConnectedPeripheral = %d",boolNum,self.isConnectedPeripheral);
 }
 
+- (void)getSystemInfoListWithCompletion:(void(^)(NSArray<NSString *> *_Nullable, FlutterError *_Nullable))completion {
+    NSLog(@"设备信息%@",self.systemInfoList);
+    completion(self.systemInfoList,nil);
+}
+
+- (void)queryDeviceSystemInfoWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
+    NSLog(@"查询设备信息");
+    [[CDBleManager shareManager] queryDeviceSystemInfoWithError:^(NSError * _Nullable error) {
+    }];
+}
 
 #pragma mark -- CDBleManagerDelegate
 - (void)cdbleManagerCenterState:(CBManagerState)state{
@@ -169,19 +168,31 @@
             self.isConnectPeripheralSuccess = YES;
             self.isDisConnectPeripheralSuccess = YES;
             NSLog(@"数据请求成功");
+            if (dataModel.cmdType == CDBleCmdTypeDeviceEnableConfig) { //配置free vending使能
+                NSLog(@"free vending使能配置成功");
+            } else if (dataModel.cmdType == CDBleCmdTypeQueryDeviceEnable) {//查询free vending使能配置
+                NSLog(@"free vending使能查询成功");
+                self.enableConfigBinaryStr = dataModel.enableConfigBinaryStr;
+                NSLog(@"%@",self.enableConfigBinaryStr);
+                self.isEnable = [[self.enableConfigBinaryStr substringWithRange:NSMakeRange(2, 1)] isEqualToString:@"1"];
+            }else if (dataModel.systemInfoList){
+                NSArray *systemInfoList = dataModel.systemInfoList;
+                for (YRunStateModel * model in systemInfoList) {
+                    NSDictionary *dic = [model dictionaryWithValuesForKeys:@[@"title",@"content",@"detailType"]];
+                    NSLog(@"+++++++++++++%@",dic);
+                    //要求转json的对象 是数组或字典 不可以是自定义的对象
+                    NSData *data = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
+                    NSString *tempStr = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
+                    NSLog(@"－－－－－－－－%@",tempStr);
+                    [self.systemInfoList addObject:tempStr];
+                    
+                }
+                NSLog(@"设备信息请求成功%@",self.systemInfoList);
+            }
         }
-        if (dataModel.cmdType == CDBleCmdTypeDeviceEnableConfig) { //配置free vending使能
-            NSLog(@"free vending使能配置成功");
-        } else if (dataModel.cmdType == CDBleCmdTypeQueryDeviceEnable) {//查询free vending使能配置
-            NSLog(@"free vending使能查询成功");
-            self.enableConfigBinaryStr = dataModel.enableConfigBinaryStr;
-            NSLog(@"%@",self.enableConfigBinaryStr);
-            self.isEnable = [[self.enableConfigBinaryStr substringWithRange:NSMakeRange(2, 1)] isEqualToString:@"1"];
-        }
+       
     }
 }
-
-
 
 #pragma mark -- tools
 - (NSString*)dictionaryToJson:(NSDictionary *)dic {
@@ -189,6 +200,36 @@
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&parseError];
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
+- (NSString*) convertObjectToJson:(NSObject*) object
+{
+    NSError *writeError = nil;
+
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:object options:NSJSONWritingPrettyPrinted error:&writeError];
+    NSString *result = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+
+    return result;
+}
 
 
+/**
+ * 查询配置使能 DD
+ */
+- (void)queryEnableConfigRFID{
+    [[CDBleManager shareManager] queryEnableConfigWithError:^(NSError * _Nullable error) {
+    }];
+}
+/**
+ * 配置设置使能 DC
+ * params: 只使用 1 字节,只传入 1 个字节 8 bit 数据
+ */
+-(void)enableConfig{
+    [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
+
+    }];
+}
+// 获取系统信息
+-(void)queryDeviceSystemInfo{
+    [[CDBleManager shareManager] queryDeviceSystemInfoWithError:^(NSError * _Nullable error) {
+    }];
+}
 @end

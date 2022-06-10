@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 存储所有的外设
 @property(nonatomic, strong)NSMutableArray *peripherals;
 @property(nonatomic, strong)NSMutableArray *names;
+@property(nonatomic, strong)NSMutableArray<NSString *> *systemInfoList;
 @property(nonatomic, strong)CBPeripheral *connectPeripheral;
 @property(nonatomic, strong)NSMutableArray *nameDic;
 @property(nonatomic, assign)BOOL isConnectPeripheralSuccess;
@@ -22,7 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign)BOOL isConnectedPeripheral;
 @property(nonatomic, copy )NSString *enableConfigBinaryStr;
 @property(nonatomic, assign)BOOL isEnable;
-@property (nonatomic, strong) UIViewController *vc;
+@property(nonatomic,copy)NSString *packageCode;
+@property(nonatomic,copy)NSString *packageVersion;
 
 @end
 

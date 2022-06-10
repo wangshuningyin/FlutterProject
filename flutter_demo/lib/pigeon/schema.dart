@@ -35,6 +35,10 @@ abstract class CallBluetoothSDK {
   void enableConfig();
   @async
   void scanQRCode();
+  @async
+  void queryDeviceSystemInfo();
+  @async
+  List<String?> getSystemInfoList();
 }
 
 // 原生调用 Flutter 方法1

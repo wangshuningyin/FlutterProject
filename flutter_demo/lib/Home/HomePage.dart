@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/Home/YRunStateModel.dart';
 import 'package:flutter_demo/Utils/routes.dart';
 import 'package:flutter_demo/Utils/LoadingUtils.dart';
 import 'package:flutter_demo/NetWorkApi/NetWorkApiRequest.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
 import 'package:flutter_demo/Home/DeviceList/DeviceListPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -24,11 +26,15 @@ class _HomePageState extends State<HomePage> {
   String lanImageStr = 'lib/images/3.0x/home_lan_select@3x.png';
   String fourGImageStr = 'lib/images/3.0x/home_4g_select@3x.png';
   String connectImageStr = 'lib/images/3.0x/home_disconnect@3x.png';
-  bool isConnectPeripheralSuccess = false;
+  // bool isConnectPeripheralSuccess = false;
   String connectState = "Connect Charger";
   String deviceName = "";
   final callBluetoothSDK = CallBluetoothSDK();
   bool isSelected = false;
+  String sessionId = '';
+  List<YRunStateModel> systemInfoList = [];
+  String packageVersion = '';
+  String packageCode = '';
 
   Future<void> callstartConnectPeripheral(String item) async {
     callBluetoothSDK.startConnectPeripheral();
@@ -46,11 +52,18 @@ class _HomePageState extends State<HomePage> {
 
   Future<bool?> callIsConnectPeripheralSuccess(String item) async {
     final res = await callBluetoothSDK.isConnectPeripheralSuccess();
-    isConnectPeripheralSuccess = res;
-    print('Flutter3------蓝牙设备连接成功$isConnectPeripheralSuccess');
-    setState(() {
-      _connectState(isConnectPeripheralSuccess);
-    });
+    print('Flutter蓝牙设备连接成功$res');
+
+    if (!res) {
+      connectionStr = "Connection Lost";
+      manualConnection = 'Reconnect';
+      LoadingUtils.showToast("Bluetooth connection failure");
+    } else {
+      callQueryDeviceSystemInfo();
+      setState(() {
+        _connectState(res);
+      });
+    }
     return res;
   }
 
@@ -73,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       String item, bool isGoToNextPage) async {
     final res = await callBluetoothSDK.isDisConnectPeripheralSuccess();
     if (isGoToNextPage) {
-      isConnectPeripheralSuccess = false;
+      // isConnectPeripheralSuccess = false;
       _navigateAndDisplaySelection(context);
     }
     return res;
@@ -82,6 +95,26 @@ class _HomePageState extends State<HomePage> {
   Future<bool?> callIsConnectPeripheral() async {
     final res = await callBluetoothSDK.isConnectedPeripheral();
     return res;
+  }
+
+  Future<void> callQueryDeviceSystemInfo() async {
+    callBluetoothSDK.queryDeviceSystemInfo();
+    callGetSystemInfoList();
+  }
+
+  Future<List<String?>> callGetSystemInfoList() async {
+    final systemInfoLists = await callBluetoothSDK.getSystemInfoList();
+    for (var jsonStr in systemInfoLists) {
+      var yRunStateModel = yRunStateModelFromJson(jsonStr!);
+      print(yRunStateModel.content);
+      systemInfoList.add(yRunStateModel);
+    }
+    for (var i = 0; i < systemInfoList.length; i++) {
+      packageCode = systemInfoList[4].content;
+      packageVersion = systemInfoList[5].content;
+    }
+    print("$systemInfoList + $packageCode + $packageVersion");
+    return systemInfoLists;
   }
 
   _clickAction() {
@@ -126,6 +159,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
     setState(() {
       if (Platform.isIOS) {
         callStartBluetooth();
@@ -133,9 +167,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  _deviceSync() {
-    Map<String, dynamic> parameter = {"deviceNumber": "TACW2244719T2347"};
-    NetWorkApiRequest.updateDevice("sessionId", parameter).then((value) async {
+  Future<void> _getSessionId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      var sessionIdStr = prefs.getString('sessionId') ?? "";
+      sessionId = sessionIdStr;
+    });
+  }
+
+  _deviceSync(String sessionID) {
+    Map<String, dynamic> parameter = {
+      "deviceNumber": deviceName,
+      "softVersion": packageVersion
+    };
+    NetWorkApiRequest.updateDevice(sessionID, parameter).then((value) async {
       if (value != null && value['code'] == 0) {
         LoadingUtils.showToast("Sync Success");
       } else {
@@ -179,11 +224,18 @@ class _HomePageState extends State<HomePage> {
           onTap: () {
             callIsConnectPeripheral().then((value) => {
                   if (value == false)
-                    {LoadingUtils.showToast("Please connect the device first")}
+                    {
+                      LoadingUtils.showToast(
+                          "Bluetooth Disconnected. Please connect charger.")
+                    }
                   else
                     {
                       if (i == 0)
-                        {_deviceSync()}
+                        {
+                          _getSessionId().then((value) {
+                            _deviceSync(sessionId);
+                          })
+                        }
                       else if (i == 1)
                         {Navigator.pushNamed(context, Routes.firmwareInfoPage)}
                       else if (i == 2)
@@ -314,7 +366,7 @@ class _HomePageState extends State<HomePage> {
                         //设置点击事件回调
                         // onTap: () => callScanForPeripherals(),
                         onTap: () {
-                          isConnectPeripheralSuccess = false;
+                          // isConnectPeripheralSuccess = false;
                           callStopConnectPeripheral(deviceName, true);
                         },
                         child: Container(
@@ -576,7 +628,7 @@ class _HomePageState extends State<HomePage> {
         isSelectedDevice = true;
         connectionStr = "Connecting...";
         manualConnection = 'Reconnect';
-        _connectState(isConnectPeripheralSuccess);
+        _connectState(false);
       }
     });
   }
