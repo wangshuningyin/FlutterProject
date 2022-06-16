@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
 
   void delayedConnectPeripheral(String item) {
     Future.delayed(const Duration(milliseconds: 4000), () {
-      print("延时4秒执行");
       callIsConnectPeripheralSuccess(item);
       return Future.value("延时4秒执行");
     });
