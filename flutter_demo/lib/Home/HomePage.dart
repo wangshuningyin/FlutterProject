@@ -221,45 +221,79 @@ class _HomePageState extends State<HomePage> {
       list.add(
         GestureDetector(
           onTap: () {
-            callIsConnectPeripheral().then((value) => {
-                  if (value == false)
-                    {
-                      LoadingUtils.showToast(
-                          "Bluetooth Disconnected. Please connect charger.")
-                    }
-                  else
-                    {
-                      if (i == 0)
-                        {
-                          _getSessionId().then((value) {
-                            _deviceSync(sessionId);
-                          })
-                        }
-                      else if (i == 1)
-                        {Navigator.pushNamed(context, Routes.firmwareInfoPage)}
-                      else if (i == 2)
-                        {Navigator.pushNamed(context, Routes.deviceInfoPage)}
-                      else if (i == 3)
-                        {Navigator.pushNamed(context, Routes.updatePage)}
-                      else if (i == 4)
-                        {Navigator.pushNamed(context, Routes.chargerLinkPage)}
-                      else if (i == 5)
-                        {Navigator.pushNamed(context, Routes.ocppServerPage)}
-                      else if (i == 6)
-                        {
-                          Navigator.pushNamed(
-                              context, Routes.setGeneralParameterPage)
-                        }
-                      else if (i == 7)
-                        {Navigator.pushNamed(context, Routes.cardConfigurePage)}
-                      else if (i == 8)
-                        {Navigator.pushNamed(context, Routes.deviceMode)}
-                      else if (i == 9)
-                        {Navigator.pushNamed(context, Routes.modbusModePage)}
-                      else
-                        {LoadingUtils.showToast("正在开发。。。。。。")}
-                    }
+            if (Platform.isIOS) {
+              callIsConnectPeripheral().then((value) => {
+                    if (value == false)
+                      {
+                        LoadingUtils.showToast(
+                            "Bluetooth Disconnected. Please connect charger.")
+                      }
+                    else
+                      {
+                        if (i == 0)
+                          {
+                            _getSessionId().then((value) {
+                              _deviceSync(sessionId);
+                            })
+                          }
+                        else if (i == 1)
+                          {
+                            Navigator.pushNamed(
+                                context, Routes.firmwareInfoPage)
+                          }
+                        else if (i == 2)
+                          {Navigator.pushNamed(context, Routes.deviceInfoPage)}
+                        else if (i == 3)
+                          {Navigator.pushNamed(context, Routes.updatePage)}
+                        else if (i == 4)
+                          {Navigator.pushNamed(context, Routes.chargerLinkPage)}
+                        else if (i == 5)
+                          {Navigator.pushNamed(context, Routes.ocppServerPage)}
+                        else if (i == 6)
+                          {
+                            Navigator.pushNamed(
+                                context, Routes.setGeneralParameterPage)
+                          }
+                        else if (i == 7)
+                          {
+                            Navigator.pushNamed(
+                                context, Routes.cardConfigurePage)
+                          }
+                        else if (i == 8)
+                          {Navigator.pushNamed(context, Routes.deviceMode)}
+                        else if (i == 9)
+                          {Navigator.pushNamed(context, Routes.modbusModePage)}
+                        else
+                          {LoadingUtils.showToast("正在开发。。。。。。")}
+                      }
+                  });
+            } else {
+              if (i == 0) {
+                _getSessionId().then((value) {
+                  _deviceSync(sessionId);
                 });
+              } else if (i == 1) {
+                Navigator.pushNamed(context, Routes.firmwareInfoPage);
+              } else if (i == 2) {
+                Navigator.pushNamed(context, Routes.deviceInfoPage);
+              } else if (i == 3) {
+                Navigator.pushNamed(context, Routes.updatePage);
+              } else if (i == 4) {
+                Navigator.pushNamed(context, Routes.chargerLinkPage);
+              } else if (i == 5) {
+                Navigator.pushNamed(context, Routes.ocppServerPage);
+              } else if (i == 6) {
+                Navigator.pushNamed(context, Routes.setGeneralParameterPage);
+              } else if (i == 7) {
+                Navigator.pushNamed(context, Routes.cardConfigurePage);
+              } else if (i == 8) {
+                Navigator.pushNamed(context, Routes.deviceMode);
+              } else if (i == 9) {
+                Navigator.pushNamed(context, Routes.modbusModePage);
+              } else {
+                LoadingUtils.showToast("正在开发。。。。。。");
+              }
+            }
           },
           child: Container(
             alignment: Alignment.center,
