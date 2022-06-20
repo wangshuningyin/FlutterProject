@@ -5,8 +5,8 @@ import 'package:flutter_demo/Utils/DataPickerTool.dart';
 import 'package:flutter_demo/Home/LoadBalance/ModbusModePage.dart';
 
 class ModbusRtuPage extends StatefulWidget {
-  final Map type;
-  const ModbusRtuPage({Key? key, required this.type}) : super(key: key);
+  final Map arguments;
+  const ModbusRtuPage({Key? key, required this.arguments}) : super(key: key);
   @override
   State<ModbusRtuPage> createState() => _ModbusRtuPageState();
 }
@@ -65,7 +65,7 @@ class _ModbusRtuPageState extends State<ModbusRtuPage> {
   void initState() {
     super.initState();
     if (Platform.isIOS) {}
-    print(widget.type);
+    print(widget.arguments);
     addressController.text = '1';
     capacityController.text = '--';
     capacityController.addListener(() {
@@ -338,7 +338,7 @@ class _ModbusRtuPageState extends State<ModbusRtuPage> {
                 SliverList(
                   delegate: SliverChildListDelegate(
                     // crossAxisAlignment: CrossAxisAlignment.start,
-                    _getListData(widget.type['type'] ==
+                    _getListData(widget.arguments['type'] ==
                             LoadBalanceSourceType
                                 .LoadBalanceSourceTypeSinglePrimary
                         ? singlePrimaryList

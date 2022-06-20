@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 class PackageEditPage extends StatefulWidget {
-  final Map type;
-  const PackageEditPage({Key? key, required this.type}) : super(key: key);
+  final Map arguments;
+  const PackageEditPage({Key? key, required this.arguments}) : super(key: key);
   @override
   State<PackageEditPage> createState() => _PackageEditPageState();
 }
@@ -163,12 +163,12 @@ class _PackageEditPageState extends State<PackageEditPage> {
         backgroundColor: Colors.white,
       ),
       body: ListView.builder(
-        itemCount: widget.type["type"] == "type" ? 2 : widgets.length,
+        itemCount: widget.arguments["type"] == "type" ? 2 : widgets.length,
         itemBuilder: (BuildContext context, int position) {
           if (position == 0) {
             return listWidget();
           } else {
-            if (widget.type["type"] == 'type') {
+            if (widget.arguments["type"] == 'type') {
               return emptyWidget();
             } else {
               return getRow(position);

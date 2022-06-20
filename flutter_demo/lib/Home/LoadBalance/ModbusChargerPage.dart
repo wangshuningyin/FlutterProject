@@ -4,9 +4,9 @@ import 'package:flutter_demo/Utils/routes.dart';
 import 'package:flutter_demo/Home/LoadBalance/ModbusModePage.dart';
 
 class ModbusChargerPage extends StatefulWidget {
-  final Map type;
-
-  const ModbusChargerPage({Key? key, required this.type}) : super(key: key);
+  final Map arguments;
+  const ModbusChargerPage({Key? key, required this.arguments})
+      : super(key: key);
   @override
   State<ModbusChargerPage> createState() => _ModbusChargerPageState();
 }
@@ -16,7 +16,7 @@ class _ModbusChargerPageState extends State<ModbusChargerPage> {
   void initState() {
     super.initState();
     if (Platform.isIOS) {}
-    print(widget.type);
+    print(widget.arguments);
   }
 
   Widget heightLineWidget(double left, double top, double right, Color color) {
@@ -120,10 +120,15 @@ class _ModbusChargerPageState extends State<ModbusChargerPage> {
         children: [
           heightLineWidget(
               20, 20, MediaQuery.of(context).size.width - 100, Colors.red),
-          textWidget(20, FontWeight.bold, widget.type["modbusModeTitle"], 20,
-              20, Colors.black),
-          textWidget(18, FontWeight.w400, widget.type["modbusModeSubTitle"], 20,
-              24, Colors.grey.shade900),
+          textWidget(20, FontWeight.bold, widget.arguments["modbusModeTitle"],
+              20, 20, Colors.black),
+          textWidget(
+              18,
+              FontWeight.w400,
+              widget.arguments["modbusModeSubTitle"],
+              20,
+              24,
+              Colors.grey.shade900),
           textWidget(
               17,
               FontWeight.w400,
@@ -147,7 +152,7 @@ class _ModbusChargerPageState extends State<ModbusChargerPage> {
               color: Colors.white,
               borderRadius: BorderRadius.circular((5.0)),
             ),
-            widget.type['type'],
+            widget.arguments['type'],
           ),
           modbusWidget(
             "Modbus \nTCP/IP",
@@ -155,13 +160,13 @@ class _ModbusChargerPageState extends State<ModbusChargerPage> {
             20,
             30,
             BoxDecoration(
-              color: widget.type['type'] ==
+              color: widget.arguments['type'] ==
                       LoadBalanceSourceType
                           .LoadBalanceSourceTypeMultipleSecondary
                   ? Colors.white
                   : Colors.grey.shade100,
               borderRadius: BorderRadius.circular((5.0)),
-              boxShadow: widget.type['type'] ==
+              boxShadow: widget.arguments['type'] ==
                       LoadBalanceSourceType
                           .LoadBalanceSourceTypeMultipleSecondary
                   ? [
@@ -173,7 +178,7 @@ class _ModbusChargerPageState extends State<ModbusChargerPage> {
                     ]
                   : null,
             ),
-            widget.type['type'],
+            widget.arguments['type'],
           ),
         ],
       ),

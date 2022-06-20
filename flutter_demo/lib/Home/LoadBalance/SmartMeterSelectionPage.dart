@@ -6,8 +6,8 @@ import 'package:flutter_demo/Utils/routes.dart';
 import 'package:flutter_demo/Utils/DataPickerTool.dart';
 
 class SmartMeterSelectionPage extends StatefulWidget {
-  final Map type;
-  const SmartMeterSelectionPage({Key? key, required this.type})
+  final Map arguments;
+  const SmartMeterSelectionPage({Key? key, required this.arguments})
       : super(key: key);
   @override
   State<SmartMeterSelectionPage> createState() =>
@@ -30,7 +30,7 @@ class _SmartMeterSelectionPageState extends State<SmartMeterSelectionPage> {
   void initState() {
     super.initState();
     if (Platform.isIOS) {}
-    print(widget.type);
+    print(widget.arguments);
   }
 
   Function()? _saveAction() {
@@ -43,7 +43,7 @@ class _SmartMeterSelectionPageState extends State<SmartMeterSelectionPage> {
       Navigator.pushNamed(
         context,
         Routes.modbusRtuPage,
-        arguments: widget.type,
+        arguments: widget.arguments,
       );
     };
   }
