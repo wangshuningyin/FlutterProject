@@ -385,6 +385,114 @@ void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObje
       [channel setMessageHandler:nil];
     }
   }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.queryNetworkState"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(queryNetworkStateWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(queryNetworkStateWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api queryNetworkStateWithCompletion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.queryDeviceConfigType"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(queryDeviceConfigTypeWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(queryDeviceConfigTypeWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api queryDeviceConfigTypeWithCompletion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.queryOCPPConfigParams"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(queryOCPPConfigParamsWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(queryOCPPConfigParamsWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api queryOCPPConfigParamsWithCompletion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.getNetworkingStateData"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getNetworkingStateDataWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(getNetworkingStateDataWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getNetworkingStateDataWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.getDeviceConfigData"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getDeviceConfigDataWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(getDeviceConfigDataWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getDeviceConfigDataWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.getOCPPConfigParams"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getOCPPConfigParamsWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(getOCPPConfigParamsWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getOCPPConfigParamsWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
 }
 @interface FLTMyApiCodecReader : FlutterStandardReader
 @end

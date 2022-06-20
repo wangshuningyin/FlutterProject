@@ -128,6 +128,41 @@
     }];
 }
 
+- (void)queryNetworkStateWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
+    [[CDBleManager shareManager] queryNetworkStateWithError:^(NSError * _Nullable error) {
+        
+    }];
+}
+
+
+- (void)queryOCPPConfigParamsWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
+    [[CDBleManager shareManager] queryOCPPConfigParamsWithError:^(NSError * _Nullable error) {
+        
+    }];
+}
+
+- (void)getDeviceConfigDataWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
+    completion(self.deviceConfigStr,nil);
+}
+
+
+- (void)getNetworkingStateDataWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
+    completion([NSString stringWithFormat:@"%ld%ld",self.networkingStateResultType, self.networkModelCode],nil);
+}
+
+- (void)getOCPPConfigParamsWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
+    completion(self.domain,nil);
+}
+
+
+- (void)queryDeviceConfigTypeWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
+    [[CDBleManager shareManager] queryDeviceConfigType:DeviceConfigTypeQueryMacAddress error:^(NSError * _Nullable error) {
+        
+    }];
+}
+
+
+
 #pragma mark -- CDBleManagerDelegate
 - (void)cdbleManagerCenterState:(CBManagerState)state{
     NSLog(@"蓝牙开启与关闭状态:*****%ld",(long)state);
@@ -185,12 +220,21 @@
                     NSString *tempStr = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
                     NSLog(@"－－－－－－－－%@",tempStr);
                     [self.systemInfoList addObject:tempStr];
-                    
                 }
                 NSLog(@"设备信息请求成功%@",self.systemInfoList);
+            }else if (dataModel.networkingState){
+                CDBleNetworkingState *networkingState = dataModel.networkingState;
+                self.networkingStateResultType = dataModel.networkingState.resultType;
+                self.networkModelCode = networkingState.networkModelCode;
+                NSLog(@"resultType == %ld",dataModel.networkingState.resultType);
+            }else if(dataModel.deviceConfigModel){
+                self.deviceConfigStr = [NSString stringWithFormat:@"%ld,%@",dataModel.deviceConfigModel.resultCode, dataModel.deviceConfigModel.params];
+                NSLog(@"－－－－－－－－%@",self.deviceConfigStr);
+            }else if(dataModel.ocppConfigParamsModel){
+                NSLog(@"%@",dataModel.ocppConfigParamsModel.domain);
+                self.domain = dataModel.ocppConfigParamsModel.domain;
             }
         }
-       
     }
 }
 
@@ -213,23 +257,37 @@
 
 /**
  * 查询配置使能 DD
- */
-- (void)queryEnableConfigRFID{
-    [[CDBleManager shareManager] queryEnableConfigWithError:^(NSError * _Nullable error) {
-    }];
+ * - (void)queryEnableConfigRFID{
+ [[CDBleManager shareManager] queryEnableConfigWithError:^(NSError * _Nullable error) {
+ }];
 }
+ */
+
 /**
  * 配置设置使能 DC
  * params: 只使用 1 字节,只传入 1 个字节 8 bit 数据
- */
--(void)enableConfig{
-    [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
+ * -(void)enableConfig{
+ [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
 
-    }];
+ }];
 }
+ */
+
 // 获取系统信息
--(void)queryDeviceSystemInfo{
-    [[CDBleManager shareManager] queryDeviceSystemInfoWithError:^(NSError * _Nullable error) {
-    }];
-}
+//-(void)queryDeviceSystemInfo{
+//    [[CDBleManager shareManager] queryDeviceSystemInfoWithError:^(NSError * _Nullable error) {
+//    }];
+//}
+
+//- (void)queryInternetConnectModel{
+//    [[CDBleManager shareManager] queryNetworkStateWithError:^(NSError * _Nullable error) {
+//
+//    }];
+//}
+//
+//- (void)loadDevceServerConfigInfo{
+//    [[CDBleManager shareManager] queryOCPPConfigParamsWithError:^(NSError * _Nullable error) {
+//
+//    }];
+//}
 @end

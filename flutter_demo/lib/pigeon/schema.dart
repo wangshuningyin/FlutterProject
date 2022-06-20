@@ -39,6 +39,18 @@ abstract class CallBluetoothSDK {
   void queryDeviceSystemInfo();
   @async
   List<String?> getSystemInfoList();
+  @async
+  void queryNetworkState();
+  @async
+  void queryDeviceConfigType();
+  @async
+  void queryOCPPConfigParams();
+  @async
+  String getNetworkingStateData();
+  @async
+  String getDeviceConfigData();
+  @async
+  String getOCPPConfigParams();
 }
 
 // 原生调用 Flutter 方法1
