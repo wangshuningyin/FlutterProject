@@ -26,9 +26,9 @@ class _HomePageState extends State<HomePage> {
   String lanImageStr = 'lib/images/3.0x/home_lan_select@3x.png';
   String fourGImageStr = 'lib/images/3.0x/home_4g_select@3x.png';
   String connectImageStr = 'lib/images/3.0x/home_disconnect@3x.png';
-  // bool isConnectPeripheralSuccess = false;
+  bool isConnectPeripheralSuccess = false;
   String connectState = "Connect Charger";
-  String deviceName = "";
+  String deviceNumber = "";
   final callBluetoothSDK = CallBluetoothSDK();
   bool isSelected = false;
   String sessionId = '';
@@ -52,6 +52,7 @@ class _HomePageState extends State<HomePage> {
   Future<bool?> callIsConnectPeripheralSuccess(String item) async {
     final res = await callBluetoothSDK.isConnectPeripheralSuccess();
     print('Flutter蓝牙设备连接成功$res');
+    isConnectPeripheralSuccess = res;
 
     if (!res) {
       connectionStr = "Connection Lost";
@@ -86,6 +87,7 @@ class _HomePageState extends State<HomePage> {
     final res = await callBluetoothSDK.isDisConnectPeripheralSuccess();
     if (isGoToNextPage) {
       // isConnectPeripheralSuccess = false;
+      isSelected = false;
       _navigateAndDisplaySelection(context);
     }
     return res;
@@ -123,11 +125,11 @@ class _HomePageState extends State<HomePage> {
         print('Flutter2------开始断开蓝牙设备');
         connectionStr = "Connection Lost";
         manualConnection = 'Reconnect';
-        callStopConnectPeripheral(deviceName, false);
+        callStopConnectPeripheral(deviceNumber, false);
         _connectState(!isSelected);
       } else {
         print('Flutter2------开始连接蓝牙设备');
-        callstartConnectPeripheral(deviceName);
+        callstartConnectPeripheral(deviceNumber);
         connectionStr = "Connecting...";
         manualConnection = 'Reconnect';
         // _connectState(!isSelected);
@@ -176,7 +178,7 @@ class _HomePageState extends State<HomePage> {
 
   _deviceSync(String sessionID) {
     Map<String, dynamic> parameter = {
-      "deviceNumber": deviceName,
+      "deviceNumber": deviceNumber,
       "softVersion": packageVersion
     };
     NetWorkApiRequest.updateDevice(sessionID, parameter).then((value) async {
@@ -242,7 +244,15 @@ class _HomePageState extends State<HomePage> {
                                 context, Routes.firmwareInfoPage)
                           }
                         else if (i == 2)
-                          {Navigator.pushNamed(context, Routes.deviceInfoPage)}
+                          {
+                            Navigator.pushNamed(
+                              context,
+                              Routes.deviceInfoPage,
+                              arguments: {
+                                "deviceNumber": deviceNumber,
+                              },
+                            )
+                          }
                         else if (i == 3)
                           {Navigator.pushNamed(context, Routes.updatePage)}
                         else if (i == 4)
@@ -400,7 +410,7 @@ class _HomePageState extends State<HomePage> {
                         // onTap: () => callScanForPeripherals(),
                         onTap: () {
                           // isConnectPeripheralSuccess = false;
-                          callStopConnectPeripheral(deviceName, true);
+                          callStopConnectPeripheral(deviceNumber, true);
                         },
                         child: Container(
                           //设置 child 居中
@@ -487,7 +497,7 @@ class _HomePageState extends State<HomePage> {
                               height: 32,
                             ),
                             onPressed: () {
-                              callStopConnectPeripheral(deviceName, true);
+                              callStopConnectPeripheral(deviceNumber, true);
                             },
                           ),
                         ],
@@ -575,7 +585,7 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(
                       height: 6,
                     ),
-                    Text(deviceName),
+                    Text(deviceNumber),
                   ],
                 ),
               ],
@@ -653,11 +663,11 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       if (result == null) {
         connectState = "Connect Charger";
-        deviceName = "";
+        deviceNumber = "";
         isSelectedDevice = false;
       } else {
         callstartConnectPeripheral(result);
-        deviceName = result.toString();
+        deviceNumber = result.toString();
         isSelectedDevice = true;
         connectionStr = "Connecting...";
         manualConnection = 'Reconnect';
