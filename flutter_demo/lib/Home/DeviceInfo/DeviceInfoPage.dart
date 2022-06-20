@@ -1,103 +1,392 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
+import 'package:flutter_demo/Utils/LoadingUtils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_demo/NetWorkApi/NetWorkApiRequest.dart';
+import 'package:flutter_demo/Home/DeviceInfo/DeviceInfoModel.dart';
 
 class DeviceInfoPage extends StatefulWidget {
-  const DeviceInfoPage({Key? key}) : super(key: key);
+  final Map arguments;
+  const DeviceInfoPage({Key? key, required this.arguments}) : super(key: key);
   @override
   State<DeviceInfoPage> createState() => _DeviceInfoPageState();
 }
 
 class _DeviceInfoPageState extends State<DeviceInfoPage> {
   List widgets = [];
-  List<String> titles = [
-    "",
-    "Serial Number",
-    "Product Type",
-    "Performance",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    ""
-  ];
-
-  List<String> titleContents = [
-    "",
-    "TACW22-4-0320-T0023",
-    "TACW22-T-R-0",
-    "Max Power",
-    "Max Current",
-    "Phases",
-    "Outlet",
-    "Internet suppot",
-    "Certification",
-    "",
-    "Type",
-    "Status",
-    ""
-  ];
-
-  List<String> titleValues = [
-    "",
-    "TACW22-4-0320-T0023",
-    "TACW22-T-R-0",
-    "22kW",
-    "32A",
-    "3",
-    "type-2 socket with shutter",
-    "4G Wi-Fi LAN",
-    "MID PTB",
-    "",
-    "Lan",
-    "Not Connected",
-    ""
-  ];
-
-  List<bool> offstageTitle = [
-    true,
-    false,
-    false,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-  ];
-  List<bool> offstageValue = [
-    true,
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-    true
-  ];
+  List dataList = [];
+  String typeStr = "";
+  String statusStr = "";
+  String sessionId = "";
+  String networkingStateResultType = "";
+  String networkModelCode = "";
+  bool isShowServerInfo = true;
+  bool isShowMacAddress = true;
+  String macAddressStr = "";
+  final callBluetoothSDK = CallBluetoothSDK();
+  List<String> titles = [];
+  List<String> titleContents = [];
+  List<bool> offstageTitle = [];
+  List<bool> offstageValue = [];
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < titles.length; i++) {
-      widgets.add(getRow(i));
+    queryOCPPConfigParams();
+    _getSessionId().then((value) {
+      _getDevice(widget.arguments["deviceNumber"]);
+    });
+  }
+
+  Future<void> queryOCPPConfigParams() async {
+    callBluetoothSDK.queryOCPPConfigParams();
+    getOCPPConfigParams();
+  }
+
+  Future<String?> getOCPPConfigParams() async {
+    final ocppConfigParams = await callBluetoothSDK.getOCPPConfigParams();
+    print("ocppConfigParams===$ocppConfigParams");
+    queryNetworkState();
+    return ocppConfigParams;
+  }
+
+  Future<void> queryDeviceConfigType() async {
+    callBluetoothSDK.queryDeviceConfigType();
+    getDeviceConfigData();
+  }
+
+  Future<String?> getDeviceConfigData() async {
+    final configData = await callBluetoothSDK.getDeviceConfigData();
+    macAddressStr = configData.substring(2);
+    var resultCode = configData.substring(0, 1);
+    print("configData===$configData");
+    if (networkModelCode == "0" ||
+        networkModelCode == "4" ||
+        resultCode == "2") {
+      isShowMacAddress = false;
+    } else {
+      isShowMacAddress = true;
     }
+    return configData;
+  }
+
+  Future<void> queryNetworkState() async {
+    callBluetoothSDK.queryNetworkState();
+    getNetworkingStateData();
+  }
+
+  Future<String?> getNetworkingStateData() async {
+    final networkingStateData = await callBluetoothSDK.getNetworkingStateData();
+    print("networkingStateData====$networkingStateData");
+    networkingStateResultType = networkingStateData.substring(0, 1);
+    statusStr = networkingStateResultType == "0" ? "Connected" : "Disconnected";
+    isShowServerInfo = networkingStateResultType == "0";
+    networkModelCode = networkingStateData.substring(1);
+    if (networkModelCode == "0") {
+      typeStr = "Offline";
+    } else if (networkModelCode == "1") {
+      typeStr = "WiFi";
+      isShowMacAddress = true;
+    } else if (networkModelCode == "2") {
+      typeStr = "LAN";
+      isShowMacAddress = true;
+    } else if (networkModelCode == "4") {
+      typeStr = "4G";
+    }
+    queryDeviceConfigType();
+    return networkingStateData;
+  }
+
+  Future<void> _getSessionId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      var sessionIdStr = prefs.getString('sessionId') ?? "";
+      sessionId = sessionIdStr;
+    });
+  }
+
+  _getDevice(String code) {
+    print("====$sessionId ====$code");
+    Map<String, String> parameter = {"deviceNumber": code};
+
+    NetWorkApiRequest.getDevice(sessionId, parameter).then((value) async {
+      if (value != null && value['code'] == 0) {
+        callBluetoothSDK.queryNetworkState().then((value) {
+          callBluetoothSDK.getNetworkingStateData().then((value) {
+            print('getDeviceConfigData:$value');
+          });
+        });
+        setState(() {
+          String str = json.encode(value);
+          // print(str);
+          var ocppServerModel = deviceInfoModelFromJson(str);
+
+          if (isShowMacAddress && isShowServerInfo) {
+            dataList = [
+              "",
+              ocppServerModel.data.list.first.deviceNumber,
+              ocppServerModel.data.list.first.hardwareModel,
+              // ocppServerModel.data.list.first.chargeType,
+              "${ocppServerModel.data.list.first.elecPower / 1000}kw",
+              "${ocppServerModel.data.list.first.ratedCurrent}A",
+              ocppServerModel.data.list.first.powerType.toString(),
+              ocppServerModel.data.list.first.outlet,
+              ocppServerModel.data.list.first.netModule.toString(),
+              ocppServerModel.data.list.first.certified.toString(),
+              "",
+              typeStr,
+              statusStr,
+              "",
+              "",
+              ""
+            ];
+            offstageValue = [
+              true,
+              true,
+              true,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              true
+            ];
+            offstageTitle = [
+              true,
+              false,
+              false,
+              false,
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+              false,
+              false,
+              true,
+            ];
+            titles = [
+              "",
+              "Serial Number",
+              "Product Type",
+              "Performance",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "Server Info",
+              "Mac Address",
+              ""
+            ];
+
+            titleContents = [
+              "",
+              "TACW22-4-0320-T0023",
+              "TACW22-T-R-0",
+              "Max Power",
+              "Max Current",
+              "Phases",
+              "Outlet",
+              "Internet suppot",
+              "Certification",
+              "",
+              "Type",
+              "Status",
+              "server info",
+              "mac address",
+              ""
+            ];
+          } else {
+            if (isShowMacAddress) {
+              dataList = [
+                "",
+                ocppServerModel.data.list.first.deviceNumber,
+                ocppServerModel.data.list.first.hardwareModel,
+                // ocppServerModel.data.list.first.chargeType,
+                "${ocppServerModel.data.list.first.elecPower / 1000}kw",
+                "${ocppServerModel.data.list.first.ratedCurrent}A",
+                ocppServerModel.data.list.first.powerType.toString(),
+                ocppServerModel.data.list.first.outlet,
+                ocppServerModel.data.list.first.netModule.toString(),
+                ocppServerModel.data.list.first.certified.toString(),
+                "",
+                typeStr,
+                statusStr,
+                "",
+                "",
+              ];
+              offstageValue = [
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+              ];
+              offstageTitle = [
+                true,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+              ];
+              titles = [
+                "",
+                "Serial Number",
+                "Product Type",
+                "Performance",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "Mac Address",
+                ""
+              ];
+
+              titleContents = [
+                "",
+                "TACW22-4-0320-T0023",
+                "TACW22-T-R-0",
+                "Max Power",
+                "Max Current",
+                "Phases",
+                "Outlet",
+                "Internet suppot",
+                "Certification",
+                "",
+                "Type",
+                "Status",
+                macAddressStr,
+                ""
+              ];
+            } else {
+              dataList = [
+                "",
+                ocppServerModel.data.list.first.deviceNumber,
+                ocppServerModel.data.list.first.hardwareModel,
+                // ocppServerModel.data.list.first.chargeType,
+                "${ocppServerModel.data.list.first.elecPower / 1000}kw",
+                "${ocppServerModel.data.list.first.ratedCurrent}A",
+                ocppServerModel.data.list.first.powerType.toString(),
+                ocppServerModel.data.list.first.outlet,
+                ocppServerModel.data.list.first.netModule.toString(),
+                ocppServerModel.data.list.first.certified.toString(),
+                "",
+                typeStr,
+                statusStr,
+                ""
+              ];
+              offstageValue = [
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true
+              ];
+              offstageTitle = [
+                true,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+              ];
+              titles = [
+                "",
+                "Serial Number",
+                "Product Type",
+                "Performance",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+              ];
+
+              titleContents = [
+                "",
+                "TACW22-4-0320-T0023",
+                "TACW22-T-R-0",
+                "Max Power",
+                "Max Current",
+                "Phases",
+                "Outlet",
+                "Internet suppot",
+                "Certification",
+                "",
+                "Type",
+                "Status",
+                ""
+              ];
+            }
+          }
+          for (int i = 0; i < dataList.length; i++) {
+            widgets.add(getRow(i));
+          }
+          // print(dataList);
+        });
+      } else {
+        LoadingUtils.showToast(value['msg']);
+      }
+    }).catchError((e) {
+      //失败
+      LoadingUtils.showToast(e.toString());
+    });
   }
 
   Widget getRow(int i) {
@@ -137,7 +426,7 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
                 child: Container(
                   margin: const EdgeInsets.only(left: 20, top: 10, right: 20),
                   child: Text(
-                    titleValues[i],
+                    dataList[i],
                     textAlign: TextAlign.left,
                     style: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.w500),
@@ -155,10 +444,10 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
         ],
       ),
       onTap: () {
-        setState(() {
-          widgets.add(getRow(widgets.length + 1));
-          print('row $i');
-        });
+        // setState(() {
+        //   widgets.add(getRow(widgets.length + 1));
+        print('row $i');
+        // });
       },
     );
   }
@@ -219,7 +508,9 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
       body: ListView.builder(
         itemCount: widgets.length,
         itemBuilder: (BuildContext context, int position) {
-          if (position == 0 || position == 9 || position == 12) {
+          if (position == 0 ||
+              position == 9 ||
+              position == widgets.length - 1) {
             if (position == 0) {
               return title("Basic Info", true);
             } else if (position == 9) {

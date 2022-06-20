@@ -59,7 +59,8 @@ class _MyAppState extends State<MyApp> {
         const PersonalCenterPage(),
     Routes.deviceMode: (BuildContext context) => const DeviceModePage(),
     Routes.chargerLinkPage: (BuildContext context) => const ChargerLinkPage(),
-    Routes.deviceInfoPage: (BuildContext context) => const DeviceInfoPage(),
+    Routes.deviceInfoPage: (BuildContext context, {arguments}) =>
+        DeviceInfoPage(arguments: arguments),
     Routes.ocppServerPage: (BuildContext context) => const OCPPServerPage(),
     Routes.ocppServerDownLoadPage: (BuildContext context) =>
         const OCPPServerDownLoadPage(),
@@ -67,11 +68,11 @@ class _MyAppState extends State<MyApp> {
         const OCPPServerConfigurePage(),
     Routes.modbusModePage: (BuildContext context) => const ModbusModePage(),
     Routes.modbusChargerPage: (BuildContext context, {arguments}) =>
-        ModbusChargerPage(type: arguments),
+        ModbusChargerPage(arguments: arguments),
     Routes.smartMeterSelection: (BuildContext context, {arguments}) =>
-        SmartMeterSelectionPage(type: arguments),
+        SmartMeterSelectionPage(arguments: arguments),
     Routes.modbusRtuPage: (BuildContext context, {arguments}) =>
-        ModbusRtuPage(type: arguments),
+        ModbusRtuPage(arguments: arguments),
     Routes.modbusTcpPage: (BuildContext context) => const ModbusTcpPage(),
     Routes.firmwareInfoPage: (BuildContext context) => const FirmwareInfoPage(),
     Routes.cardConfigurePage: (BuildContext context) =>
@@ -83,7 +84,7 @@ class _MyAppState extends State<MyApp> {
     Routes.inputSNManuallyPage: (BuildContext context) =>
         const InputSNManuallyPage(),
     Routes.packageEditPage: (BuildContext context, {arguments}) =>
-        PackageEditPage(type: arguments),
+        PackageEditPage(arguments: arguments),
   };
   @override
   void initState() {
