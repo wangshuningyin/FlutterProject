@@ -253,10 +253,39 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
     );
   }
 
+  Widget configureProcessWidget(String text) {
+    return Container(
+      margin: const EdgeInsets.only(left: 40, top: 20, right: 40),
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 14,
+            height: 14,
+            child: Image(
+              image: AssetImage("lib/images/3.0x/editor@3x.png"),
+              fit: BoxFit.fill,
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 40, top: 20, right: 40),
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 14.0,
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget configureWidget() {
     return Center(
       child: Container(
-        margin: const EdgeInsets.only(top: 30, bottom: 20),
+        margin: const EdgeInsets.only(top: 30, bottom: 60),
         width: 300,
         height: 40,
         decoration: BoxDecoration(
@@ -313,55 +342,68 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
-        child: CustomScrollView(
-          scrollDirection: Axis.vertical,
-          slivers: <Widget>[
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  imageWidget(),
-                  textWidget(
-                      12.0,
-                      FontWeight.w500,
-                      "Enable this function to allow external organizations to access the EVSE.r",
-                      10,
-                      36,
-                      Colors.black),
-                  externalWidget(),
-                  Offstage(
-                    offstage: !isSelected,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        textWidget(15.0, FontWeight.w600, "Serial Number", 20,
-                            20, Colors.black),
-                        textWidget(15.0, FontWeight.w500, "TACW22-4-0320-T0023",
-                            20, 30, Colors.black),
-                        textWidget(15.0, FontWeight.w600, "Server Info", 20, 30,
-                            Colors.black),
-                        textWidget(15.0, FontWeight.normal,
-                            "https://new.evsync.com", 20, 30, Colors.black),
-                        heightLineWidget(20, 14, 20, Colors.grey.shade400),
-                        renamingWidget(),
-                        textWidget(14.0, FontWeight.w500, "Alias", 30, 13,
-                            Colors.black),
-                        renamingInputWidget(),
-                        heightLineWidget(20, 0, 20, Colors.grey.shade400),
+        child: Column(
+          children: [
+            Expanded(
+              child: CustomScrollView(
+                scrollDirection: Axis.vertical,
+                slivers: <Widget>[
+                  SliverList(
+                    delegate: SliverChildListDelegate(
+                      [
+                        imageWidget(),
                         textWidget(
-                          13.0,
-                          FontWeight.w500,
-                          "Supports letters and numbers , special characters:\$-_.+!*’(), Maximum 64 characters.",
-                          30,
-                          10,
-                          Colors.grey.shade400,
+                            12.0,
+                            FontWeight.w500,
+                            "Enable this function to allow external organizations to access the EVSE.r",
+                            10,
+                            36,
+                            Colors.black),
+                        externalWidget(),
+                        Offstage(
+                          offstage: !isSelected,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              textWidget(15.0, FontWeight.w600, "Serial Number",
+                                  20, 20, Colors.black),
+                              textWidget(15.0, FontWeight.w500,
+                                  "TACW22-4-0320-T0023", 20, 30, Colors.black),
+                              textWidget(15.0, FontWeight.w600, "Server Info",
+                                  20, 30, Colors.black),
+                              textWidget(
+                                  15.0,
+                                  FontWeight.normal,
+                                  "https://new.evsync.com",
+                                  20,
+                                  30,
+                                  Colors.black),
+                              heightLineWidget(
+                                  20, 14, 20, Colors.grey.shade400),
+                              renamingWidget(),
+                              textWidget(14.0, FontWeight.w500, "Alias", 30, 13,
+                                  Colors.black),
+                              renamingInputWidget(),
+                              heightLineWidget(20, 0, 20, Colors.grey.shade400),
+                              textWidget(
+                                13.0,
+                                FontWeight.w500,
+                                "Supports letters and numbers , special characters:\$-_.+!*’(), Maximum 64 characters.",
+                                30,
+                                10,
+                                Colors.grey.shade400,
+                              ),
+                              configureProcessWidget("Security Identify"),
+                            ],
+                          ),
                         ),
-                        configureWidget(),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+            configureWidget(),
           ],
         ),
       ),
