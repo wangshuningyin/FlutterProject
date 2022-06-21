@@ -24,6 +24,7 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
   bool isShowServerInfo = true;
   bool isShowMacAddress = true;
   String macAddressStr = "";
+  String serverInfoStr = "";
   final callBluetoothSDK = CallBluetoothSDK();
   List<String> titles = [];
   List<String> titleContents = [];
@@ -43,31 +44,12 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
     getOCPPConfigParams();
   }
 
-  Future<String?> getOCPPConfigParams() async {
+  Future<String> getOCPPConfigParams() async {
     final ocppConfigParams = await callBluetoothSDK.getOCPPConfigParams();
     print("ocppConfigParams===$ocppConfigParams");
+    serverInfoStr = ocppConfigParams;
     queryNetworkState();
     return ocppConfigParams;
-  }
-
-  Future<void> queryDeviceConfigType() async {
-    callBluetoothSDK.queryDeviceConfigType();
-    getDeviceConfigData();
-  }
-
-  Future<String?> getDeviceConfigData() async {
-    final configData = await callBluetoothSDK.getDeviceConfigData();
-    macAddressStr = configData.substring(2);
-    var resultCode = configData.substring(0, 1);
-    print("configData===$configData");
-    if (networkModelCode == "0" ||
-        networkModelCode == "4" ||
-        resultCode == "2") {
-      isShowMacAddress = false;
-    } else {
-      isShowMacAddress = true;
-    }
-    return configData;
   }
 
   Future<void> queryNetworkState() async {
@@ -75,7 +57,7 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
     getNetworkingStateData();
   }
 
-  Future<String?> getNetworkingStateData() async {
+  Future<String> getNetworkingStateData() async {
     final networkingStateData = await callBluetoothSDK.getNetworkingStateData();
     print("networkingStateData====$networkingStateData");
     networkingStateResultType = networkingStateData.substring(0, 1);
@@ -97,6 +79,26 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
     return networkingStateData;
   }
 
+  Future<void> queryDeviceConfigType() async {
+    callBluetoothSDK.queryDeviceConfigType();
+    getDeviceConfigData();
+  }
+
+  Future<String> getDeviceConfigData() async {
+    final configData = await callBluetoothSDK.getDeviceConfigData();
+    macAddressStr = configData.substring(2);
+    var resultCode = configData.substring(0, 1);
+    print("configData===$configData");
+    if (networkModelCode == "0" ||
+        networkModelCode == "4" ||
+        resultCode == "2") {
+      isShowMacAddress = false;
+    } else {
+      isShowMacAddress = true;
+    }
+    return configData;
+  }
+
   Future<void> _getSessionId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -108,19 +110,11 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
   _getDevice(String code) {
     print("====$sessionId ====$code");
     Map<String, String> parameter = {"deviceNumber": code};
-
     NetWorkApiRequest.getDevice(sessionId, parameter).then((value) async {
       if (value != null && value['code'] == 0) {
-        callBluetoothSDK.queryNetworkState().then((value) {
-          callBluetoothSDK.getNetworkingStateData().then((value) {
-            print('getDeviceConfigData:$value');
-          });
-        });
         setState(() {
           String str = json.encode(value);
-          // print(str);
           var ocppServerModel = deviceInfoModelFromJson(str);
-
           if (isShowMacAddress && isShowServerInfo) {
             dataList = [
               "",
@@ -205,8 +199,8 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
               "",
               "Type",
               "Status",
-              "server info",
-              "mac address",
+              serverInfoStr,
+              macAddressStr,
               ""
             ];
           } else {
