@@ -29,7 +29,7 @@ class _DeviceListPage extends State<DeviceListPage> {
 
   myTimer() {
     // 定义一个函数，将定时器包裹起来
-    _timer = Timer.periodic(const Duration(milliseconds: 2000), (t) {
+    _timer = Timer.periodic(const Duration(milliseconds: 800), (t) {
       callBluetoothSDK.scanForPeripherals();
       callDeviceName().then((value) => setState(() {
             deviceNameList = value;
