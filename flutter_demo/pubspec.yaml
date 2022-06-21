@@ -128,6 +128,18 @@ flutter:
     - lib/images/3.0x/light_close@3x.png
     - lib/images/3.0x/light_open@3x.png
     - lib/images/3.0x/abb_input@3x.png
+    - lib/images/3.0x/ocpp_identify_bg_compelete@3x.png
+    - lib/images/3.0x/ocpp_identify_bg_error@3x.png
+    - ib/images/3.0x/ocpp_identify_bg_loading@3x.png
+    - lib/images/3.0x/ocpp_identify_bg_nor@3x.png
+    - lib/images/3.0x/ocpp_identify_small_compelete@3x.png
+    - lib/images/3.0x/ocpp_identify_small_error@3x.png
+    - lib/images/3.0x/ocpp_identify_small_success@3x.png
+    - lib/images/3.0x/ocpp_process_small_compelete@3x.png
+    - lib/images/3.0x/ocpp_process_small_nor@3x.png
+    - ib/images/3.0x/ocpp_upload_small_compelete@3x.png
+    - /lib/images/3.0x/ocpp_upload_small_nor@3x.png
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
