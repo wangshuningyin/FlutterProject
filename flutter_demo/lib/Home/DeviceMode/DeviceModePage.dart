@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
+import 'package:flutter_demo/Utils/LoadingUtils.dart';
 
 class DeviceModePage extends StatefulWidget {
   const DeviceModePage({Key? key}) : super(key: key);
@@ -12,27 +13,67 @@ class _DeviceModePageState extends State<DeviceModePage> {
   bool isSelected = true;
   static const String switchOff = "lib/images/3.0x/switch_off@3x.png";
   static const String switchOn = "lib/images/3.0x/switch_on@3x.png";
+  final callBluetoothSDK = CallBluetoothSDK();
+  String imageName = switchOff;
+  String enableStr = "";
+  bool isHide = false;
 
-  String imageName = switchOn;
   Future<void> queryEnableConfig() async {
-    final callBluetoothSDK = CallBluetoothSDK();
     callBluetoothSDK.queryEnableConfig();
-    getEnable();
-    print('Flutter2------free vending使能查询成功');
+    delayedGetEnable();
+    print('Flutter------free vending使能查询成功');
+  }
+
+  Future<void> enableConfig(String enableConfigBinaryStr) async {
+    callBluetoothSDK.enableConfig(enableConfigBinaryStr);
+    delayedGetIsEnableSuccess();
+    print('Flutter------free vending使能查询成功');
+  }
+
+  void delayedGetIsEnableSuccess() {
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      getIsEnableSuccess();
+      return Future.value("延时4秒执行");
+    });
+  }
+
+  void delayedGetEnable() {
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      getEnable();
+      return Future.value("延时4秒执行");
+    });
+  }
+
+  Future<void> getIsEnableSuccess() async {
+    final callBluetoothSDK = CallBluetoothSDK();
+    callBluetoothSDK.isEnableSuccess().then((value) {
+      setState(() {
+        if (value) {
+          if (isSelected) {
+            imageName = switchOn;
+            LoadingUtils.dismiss();
+          } else {
+            imageName = switchOff;
+            LoadingUtils.dismiss();
+          }
+          isHide = isSelected;
+        }
+      });
+    });
   }
 
   Future<void> getEnable() async {
     final callBluetoothSDK = CallBluetoothSDK();
     callBluetoothSDK.getEnable().then((value) {
-      isSelected = value;
       setState(() {
-        if (isSelected) {
+        isHide = value;
+        if (value) {
           imageName = switchOn;
         } else {
           imageName = switchOff;
         }
       });
-      print('Flutter2------$value');
+      print('Flutter------$value');
     });
   }
 
@@ -47,11 +88,9 @@ class _DeviceModePageState extends State<DeviceModePage> {
   _clickAction() {
     setState(() {
       isSelected = !isSelected;
-      if (isSelected) {
-        imageName = switchOn;
-      } else {
-        imageName = switchOff;
-      }
+      enableStr = isSelected ? "1" : "0";
+      LoadingUtils.show(showMsg: "Loading...");
+      enableConfig(enableStr);
     });
   }
 
@@ -108,7 +147,7 @@ class _DeviceModePageState extends State<DeviceModePage> {
             ),
           ),
           Offstage(
-            offstage: !isSelected,
+            offstage: !isHide,
             child: Container(
               margin: const EdgeInsets.only(left: 20, top: 40, right: 20),
               height: 30,
