@@ -46,7 +46,9 @@ NSObject<FlutterMessageCodec> *FLTCallBluetoothSDKGetCodec(void);
 /// @return `nil` only when `error != nil`.
 - (void)getEnableWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
-- (void)enableConfigWithCompletion:(void(^)(FlutterError *_Nullable))completion;
+- (void)enableConfigEnableConfigBinaryStr:(nullable NSString *)enableConfigBinaryStr completion:(void(^)(FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)isEnableSuccessWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)scanQRCodeWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.

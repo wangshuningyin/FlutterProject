@@ -91,7 +91,8 @@ public class Pigeon {
     void isConnectedPeripheral(Result<Boolean> result);
     void queryEnableConfig(Result<Void> result);
     void getEnable(Result<Boolean> result);
-    void enableConfig(Result<Void> result);
+    void enableConfig(String enableConfigBinaryStr, Result<Void> result);
+    void isEnableSuccess(Result<Boolean> result);
     void scanQRCode(Result<Void> result);
     void queryDeviceSystemInfo(Result<Void> result);
     void getSystemInfoList(Result<List<String>> result);
@@ -440,6 +441,11 @@ public class Pigeon {
           channel.setMessageHandler((message, reply) -> {
             Map<String, Object> wrapped = new HashMap<>();
             try {
+              ArrayList<Object> args = (ArrayList<Object>)message;
+              String enableConfigBinaryStrArg = (String)args.get(0);
+              if (enableConfigBinaryStrArg == null) {
+                throw new NullPointerException("enableConfigBinaryStrArg unexpectedly null.");
+              }
               Result<Void> resultCallback = new Result<Void>() {
                 public void success(Void result) {
                   wrapped.put("result", null);
@@ -451,7 +457,36 @@ public class Pigeon {
                 }
               };
 
-              api.enableConfig(resultCallback);
+              api.enableConfig(enableConfigBinaryStrArg, resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.isEnableSuccess", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<Boolean> resultCallback = new Result<Boolean>() {
+                public void success(Boolean result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.isEnableSuccess(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

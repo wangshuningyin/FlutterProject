@@ -32,7 +32,9 @@ abstract class CallBluetoothSDK {
   @async
   bool getEnable();
   @async
-  void enableConfig();
+  void enableConfig(String enableConfigBinaryStr);
+  @async
+  bool isEnableSuccess();
   @async
   void scanQRCode();
   @async

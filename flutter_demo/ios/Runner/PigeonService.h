@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign)NSInteger networkModelCode;
 @property(nonatomic, copy  )NSString *deviceConfigStr;
 @property(nonatomic, copy  )NSString *domain;
+@property(nonatomic, assign)BOOL isEnableSuccess;
 
 @end
 
