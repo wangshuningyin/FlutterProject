@@ -90,7 +90,8 @@ public class Pigeon {
     void isDisConnectPeripheralSuccess(Result<Boolean> result);
     void isConnectedPeripheral(Result<Boolean> result);
     void queryEnableConfig(Result<Void> result);
-    void getEnable(Result<Boolean> result);
+    void getFreeVendingEnable(Result<Boolean> result);
+    void getConfigServerEnable(Result<Boolean> result);
     void enableConfig(String enableConfigBinaryStr, Result<Void> result);
     void isEnableSuccess(Result<Boolean> result);
     void scanQRCode(Result<Void> result);
@@ -407,7 +408,7 @@ public class Pigeon {
       }
       {
         BasicMessageChannel<Object> channel =
-            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.getEnable", getCodec());
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.getFreeVendingEnable", getCodec());
         if (api != null) {
           channel.setMessageHandler((message, reply) -> {
             Map<String, Object> wrapped = new HashMap<>();
@@ -423,7 +424,36 @@ public class Pigeon {
                 }
               };
 
-              api.getEnable(resultCallback);
+              api.getFreeVendingEnable(resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.getConfigServerEnable", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<Boolean> resultCallback = new Result<Boolean>() {
+                public void success(Boolean result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.getConfigServerEnable(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

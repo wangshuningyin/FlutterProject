@@ -22,7 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign)BOOL isDisConnectPeripheralSuccess;
 @property(nonatomic, assign)BOOL isConnectedPeripheral;
 @property(nonatomic, copy  )NSString *enableConfigBinaryStr;
-@property(nonatomic, assign)BOOL isEnable;
+@property(nonatomic, assign)BOOL isFreeVendingEnable;
+@property(nonatomic, assign)BOOL isConfigServerEnable;
 @property(nonatomic, copy  )NSString *packageCode;
 @property(nonatomic, copy  )NSString *packageVersion;
 @property(nonatomic, assign)NSInteger networkingStateResultType;

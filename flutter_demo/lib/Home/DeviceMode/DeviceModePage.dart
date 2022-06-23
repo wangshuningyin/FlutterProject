@@ -24,6 +24,28 @@ class _DeviceModePageState extends State<DeviceModePage> {
     print('Flutter------free vending使能查询成功');
   }
 
+  void delayedGetEnable() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      getFreeVendingEnable();
+      return Future.value("延时4秒执行");
+    });
+  }
+
+  Future<void> getFreeVendingEnable() async {
+    final callBluetoothSDK = CallBluetoothSDK();
+    callBluetoothSDK.getFreeVendingEnable().then((value) {
+      setState(() {
+        isHide = value;
+        if (value) {
+          imageName = switchOn;
+        } else {
+          imageName = switchOff;
+        }
+      });
+      print('Flutter------$value');
+    });
+  }
+
   Future<void> enableConfig(String enableConfigBinaryStr) async {
     callBluetoothSDK.enableConfig(enableConfigBinaryStr);
     delayedGetIsEnableSuccess();
@@ -31,15 +53,8 @@ class _DeviceModePageState extends State<DeviceModePage> {
   }
 
   void delayedGetIsEnableSuccess() {
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       getIsEnableSuccess();
-      return Future.value("延时4秒执行");
-    });
-  }
-
-  void delayedGetEnable() {
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      getEnable();
       return Future.value("延时4秒执行");
     });
   }
@@ -59,21 +74,6 @@ class _DeviceModePageState extends State<DeviceModePage> {
           isHide = isSelected;
         }
       });
-    });
-  }
-
-  Future<void> getEnable() async {
-    final callBluetoothSDK = CallBluetoothSDK();
-    callBluetoothSDK.getEnable().then((value) {
-      setState(() {
-        isHide = value;
-        if (value) {
-          imageName = switchOn;
-        } else {
-          imageName = switchOff;
-        }
-      });
-      print('Flutter------$value');
     });
   }
 

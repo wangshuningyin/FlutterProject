@@ -91,16 +91,23 @@
     }];
     NSLog(@"iOS: free vending数据转化%@",[self toArrFromStr:enableConfigBinaryStr]);
 }
+
 - (void)isEnableSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
     NSNumber* isEnableSuccess = [NSNumber numberWithBool:self.isEnableSuccess];
     completion(isEnableSuccess,nil);
     NSLog(@"iOS: self.isEnableSuccess === %d",self.isEnableSuccess);
 }
 
-- (void)getEnableWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
-    NSNumber* isEnable = [NSNumber numberWithBool:self.isEnable];
-    completion(isEnable,nil);
-    NSLog(@"iOS: self.isEnable === %d",self.isEnable);
+- (void)getFreeVendingEnableWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
+    NSNumber* isFreeVendingEnable = [NSNumber numberWithBool:self.isFreeVendingEnable];
+    completion(isFreeVendingEnable,nil);
+    NSLog(@"iOS: self.isFreeVendingEnable === %d",self.isFreeVendingEnable);
+}
+
+- (void)getConfigServerEnableWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
+    NSNumber* isConfigServerEnable = [NSNumber numberWithBool:self.isConfigServerEnable];
+    completion(isConfigServerEnable,nil);
+    NSLog(@"iOS: self.isConfigServerEnable === %d",self.isConfigServerEnable);
 }
 
 - (void)scanQRCodeWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
@@ -213,8 +220,10 @@
                 NSLog(@"iOS: free vending使能查询成功");
                 self.enableConfigBinaryStr = dataModel.enableConfigBinaryStr;
                 NSLog(@"iOS: dataModel.enableConfigBinaryStr == %@",self.enableConfigBinaryStr);
-                self.isEnable = [[self.enableConfigBinaryStr substringWithRange:NSMakeRange(2, 1)] isEqualToString:@"1"];
-                NSLog(@"iOS: self.isEnable == %d",self.isEnable);
+                self.isFreeVendingEnable = [[self.enableConfigBinaryStr substringWithRange:NSMakeRange(2, 1)] isEqualToString:@"1"];
+                NSLog(@"iOS: self.isFreeVendingEnable == %d",self.isFreeVendingEnable);
+                self.isConfigServerEnable = [[self.enableConfigBinaryStr substringWithRange:NSMakeRange(0, 1)] isEqualToString:@"0"];
+                NSLog(@"iOS: self.isConfigServerEnable == %d",self.isConfigServerEnable);
             }else if (dataModel.systemInfoList){
                 NSArray *systemInfoList = dataModel.systemInfoList;
                 for (YRunStateModel * model in systemInfoList) {

@@ -44,7 +44,9 @@ NSObject<FlutterMessageCodec> *FLTCallBluetoothSDKGetCodec(void);
 /// @return `nil` only when `error != nil`.
 - (void)queryEnableConfigWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
-- (void)getEnableWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
+- (void)getFreeVendingEnableWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)getConfigServerEnableWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)enableConfigEnableConfigBinaryStr:(nullable NSString *)enableConfigBinaryStr completion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.

@@ -39,7 +39,7 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
 
   Future<void> getEnable() async {
     final callBluetoothSDK = CallBluetoothSDK();
-    callBluetoothSDK.getEnable().then((value) {
+    callBluetoothSDK.getFreeVendingEnable().then((value) {
       isWifiSelected = value;
       setState(() {
         if (isWifiSelected) {

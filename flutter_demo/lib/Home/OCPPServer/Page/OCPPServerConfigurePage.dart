@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
 
 class OCPPServerConfigurePage extends StatefulWidget {
   const OCPPServerConfigurePage({Key? key}) : super(key: key);
@@ -7,20 +10,71 @@ class OCPPServerConfigurePage extends StatefulWidget {
       _OCPPServerConfigurePageState();
 }
 
-class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
-  bool isSelected = true;
+class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
+    with TickerProviderStateMixin {
+  final callBluetoothSDK = CallBluetoothSDK();
+
   static const String switchOff = "lib/images/3.0x/switch_off@3x.png";
   static const String switchOn = "lib/images/3.0x/switch_on@3x.png";
-  String imageName = switchOn;
+  String imageName = switchOff;
+
+  static const String identifyBgCompelete =
+      "lib/images/3.0x/ocpp_identify_bg_compelete@3x.png";
+  static const String identifyBgError =
+      "lib/images/3.0x/ocpp_identify_bg_error@3x.png";
+  static const String identifyBgLoading =
+      "lib/images/3.0x/ocpp_identify_bg_loading@3x.png";
+  static const String identifyBgNor =
+      "lib/images/3.0x/ocpp_identify_bg_nor@3x.png";
+  static const String identifySmallCompelete =
+      "lib/images/3.0x/ocpp_identify_small_compelete@3x.png";
+  static const String identifySmallError =
+      "lib/images/3.0x/ocpp_identify_small_error@3x.png";
+  static const String identifySmallSuccess =
+      "lib/images/3.0x/ocpp_identify_small_success@3x.png";
+  static const String processSmallCompelete =
+      "lib/images/3.0x/ocpp_process_small_compelete@3x.png";
+  static const String processSmallNor =
+      "lib/images/3.0x/ocpp_process_small_nor@3x.png";
+  static const String uploadSmallCompelete =
+      "lib/images/3.0x/ocpp_upload_small_compelete@3x.png";
+  static const String uploadSmallNor =
+      "lib/images/3.0x/ocpp_upload_small_nor@3x.png";
+
+  late AnimationController identifyAnimationController;
+  late AnimationController uploadAnimationController;
+  late AnimationController processController;
+  late Animation<double> identifyAnimation;
+  late Animation<double> uploadAnimation;
+  late Animation<double> processAnimation;
+
+  String identifyBigImageName = identifyBgLoading;
+  String identifySmallImageName = identifySmallCompelete;
+  String uploadBigImageName = identifyBgNor;
+  String uploadSmallImageName = uploadSmallNor;
+  String processBigImageName = identifyBgNor;
+  String processSmallImageName = processSmallNor;
+
+  Color identifyColor = Colors.black;
+  Color uploadColor = Colors.black;
+  Color processColor = Colors.black;
+
+  ScrollController scrollController = ScrollController();
 
   TextEditingController editorController = TextEditingController();
   FocusNode editorFocusNode = FocusNode();
+
+  bool isSelected = false;
   bool isEditor = false;
+  bool isShowProcess = true;
+  bool isHideConfigBtn = false;
+
   @override
   void initState() {
     // editorFocusNode.unfocus();
     // editorFocusNode.canRequestFocus = false;
     // SystemChannels.textInput.invokeMethod('TextInput.hide');
+    queryEnableConfig();
     String textStr = "TACW2240320T0023";
     editorController.text = textStr;
 
@@ -42,16 +96,57 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
         });
       }
     });
-    // editorController.addListener(() {
-    //   setState(() {
-    //     print("开始编辑");
-    //   });
-    // });
-    // setState(() {
-    //   if (Platform.isIOS) {
-    //     print("objectToJson(UserInfo())");
-    //   }
-    // });
+
+    identifyAnimationController = AnimationController(
+        duration: const Duration(seconds: 300), vsync: this);
+
+    identifyAnimation = Tween<double>(
+      begin: 1,
+      end: 300,
+    ).animate(identifyAnimationController)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          // 动画完成后反转
+          identifyAnimationController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          // 反转回初始状态时继续播放，实现无限循环
+          identifyAnimationController.forward();
+        }
+      });
+
+    uploadAnimationController = AnimationController(
+        duration: const Duration(seconds: 300), vsync: this);
+
+    uploadAnimation = Tween<double>(
+      begin: 1,
+      end: 300,
+    ).animate(uploadAnimationController)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          // 动画完成后反转
+          uploadAnimationController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          // 反转回初始状态时继续播放，实现无限循环
+          uploadAnimationController.forward();
+        }
+      });
+
+    processController = AnimationController(
+        duration: const Duration(seconds: 300), vsync: this);
+
+    processAnimation = Tween<double>(
+      begin: 1,
+      end: 300,
+    ).animate(processController)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          // 动画完成后反转
+          processController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          // 反转回初始状态时继续播放，实现无限循环
+          processController.forward();
+        }
+      });
     super.initState();
   }
 
@@ -59,9 +154,11 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
     setState(() {
       isSelected = !isSelected;
       if (isSelected) {
+        isHideConfigBtn = true;
         imageName = switchOn;
       } else {
         imageName = switchOff;
+        isHideConfigBtn = false;
       }
     });
   }
@@ -70,6 +167,79 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
     setState(() {
       print("dianji");
       isEditor = true;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  myTimer() {
+    // 定义一个函数，将定时器包裹起来
+    var counter = 9;
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      print(timer.tick);
+      identifyAnimationController.forward();
+      counter--;
+      if (counter == 6) {
+        print('Cancel timer');
+        identifyAnimationController.stop();
+        uploadAnimationController.forward();
+        setState(() {
+          identifyColor = const Color.fromARGB(229, 61, 33, 243);
+          identifyBigImageName = identifyBgCompelete;
+          identifySmallImageName = identifySmallSuccess;
+          uploadBigImageName = identifyBgLoading;
+          uploadSmallImageName = uploadSmallCompelete;
+        });
+      } else if (counter == 3) {
+        uploadAnimationController.stop();
+        processController.forward();
+        setState(() {
+          uploadColor = const Color.fromARGB(229, 61, 33, 243);
+          uploadBigImageName = identifyBgCompelete;
+          uploadSmallImageName = identifySmallSuccess;
+          processBigImageName = identifyBgLoading;
+          processSmallImageName = processSmallCompelete;
+        });
+        // timer.cancel();
+      } else if (counter == 0) {
+        setState(() {
+          processColor = const Color.fromARGB(229, 61, 33, 243);
+          processBigImageName = identifyBgCompelete;
+          processSmallImageName = identifySmallSuccess;
+        });
+        timer.cancel();
+      }
+    });
+  }
+
+  Future<void> queryEnableConfig() async {
+    callBluetoothSDK.queryEnableConfig();
+    delayedGetEnable();
+    print('Flutter------free vending使能查询成功');
+  }
+
+  void delayedGetEnable() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      getConfigServerEnable();
+      return Future.value("延时4秒执行");
+    });
+  }
+
+  Future<void> getConfigServerEnable() async {
+    callBluetoothSDK.getConfigServerEnable().then((value) {
+      setState(() {
+        isSelected = value;
+        isHideConfigBtn = value;
+        if (value) {
+          imageName = switchOn;
+        } else {
+          imageName = switchOff;
+        }
+      });
+      print('Flutter------$value');
     });
   }
 
@@ -282,12 +452,92 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
     );
   }
 
-  Widget configureWidget() {
+  Widget imageTextWidget(String text, String bgImgStr, String smallImgStr,
+      Animation<double> animation, Color textColor) {
+    return Container(
+      margin: const EdgeInsets.only(left: 40, top: 20, right: 40),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 30,
+            height: 30,
+            child: Stack(
+              children: [
+                Positioned(
+                  child: Center(
+                    child: RotationTransition(
+                      //设置动画的旋转中心
+                      alignment: Alignment.center,
+                      //动画控制器
+                      turns: animation,
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(bgImgStr),
+                            fit: BoxFit.cover,
+                          ),
+                          // color: Color(0xFFFF542C),
+                          // borderRadius: BorderRadius.circular(1000)
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  child: Center(
+                    child: IconButton(
+                      icon: Image.asset(
+                        smallImgStr,
+                        fit: BoxFit.scaleDown,
+                        width: 20,
+                        height: 20,
+                      ),
+                      onPressed: null,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 10, top: 0, right: 40),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 14.0,
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget processWidget() {
+    return Column(
+      children: [
+        imageTextWidget("Serial Number", identifyBigImageName,
+            identifySmallImageName, identifyAnimation, identifyColor),
+        imageTextWidget("Certificate Upload", uploadBigImageName,
+            uploadSmallImageName, uploadAnimation, uploadColor),
+        imageTextWidget("Configure Process", processBigImageName,
+            processSmallImageName, processAnimation, processColor),
+        configureWidget(150, 40, "OK", okAction),
+      ],
+    );
+  }
+
+  Widget configureWidget(
+      double width, double height, String text, void Function() action) {
     return Center(
       child: Container(
         margin: const EdgeInsets.only(top: 30, bottom: 60),
-        width: 300,
-        height: 40,
+        width: width,
+        height: height,
         decoration: BoxDecoration(
           boxShadow: const [BoxShadow(color: Colors.grey, blurRadius: 10.0)],
           color: Colors.black,
@@ -303,20 +553,38 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
               ),
             ),
           ),
-          child: const Text(
-            "Configure",
-            style: TextStyle(
+          child: Text(
+            text,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: Colors.white,
             ),
           ),
-          onPressed: () {
-            print("objectToJson(UserInfo())");
-          },
+          onPressed: action,
         ),
       ),
     );
+  }
+
+  void configureAction() {
+    setState(() {
+      isShowProcess = false;
+      isHideConfigBtn = true;
+      scrollController.jumpTo(200);
+      //   scrollController.animateTo(200.0,
+      //       duration: const Duration(milliseconds: 1), curve: Curves.easeIn);
+    });
+    myTimer();
+    print("objectToJson(UserInfo())");
+  }
+
+  void okAction() {
+    setState(() {
+      isShowProcess = true;
+      isHideConfigBtn = false;
+      scrollController.jumpTo(0);
+    });
   }
 
   @override
@@ -347,6 +615,7 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
             Expanded(
               child: CustomScrollView(
                 scrollDirection: Axis.vertical,
+                controller: scrollController,
                 slivers: <Widget>[
                   SliverList(
                     delegate: SliverChildListDelegate(
@@ -393,7 +662,10 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
                                 10,
                                 Colors.grey.shade400,
                               ),
-                              configureProcessWidget("Security Identify"),
+                              Offstage(
+                                offstage: isShowProcess,
+                                child: processWidget(),
+                              ),
                             ],
                           ),
                         ),
@@ -403,7 +675,10 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage> {
                 ],
               ),
             ),
-            configureWidget(),
+            Offstage(
+              offstage: !isHideConfigBtn,
+              child: configureWidget(300, 40, "Configure", configureAction),
+            )
           ],
         ),
       ),

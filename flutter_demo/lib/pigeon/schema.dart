@@ -30,7 +30,9 @@ abstract class CallBluetoothSDK {
   @async
   void queryEnableConfig();
   @async
-  bool getEnable();
+  bool getFreeVendingEnable();
+  @async
+  bool getConfigServerEnable();
   @async
   void enableConfig(String enableConfigBinaryStr);
   @async
