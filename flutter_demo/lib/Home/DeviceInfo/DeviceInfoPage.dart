@@ -41,11 +41,11 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
 
   Future<void> queryOCPPConfigParams() async {
     callBluetoothSDK.queryOCPPConfigParams();
-    getOCPPConfigParams();
+    getDomain();
   }
 
-  Future<String> getOCPPConfigParams() async {
-    final ocppConfigParams = await callBluetoothSDK.getOCPPConfigParams();
+  Future<String> getDomain() async {
+    var ocppConfigParams = await callBluetoothSDK.getDomain();
     print("ocppConfigParams===$ocppConfigParams");
     serverInfoStr = ocppConfigParams;
     queryNetworkState();
@@ -58,7 +58,7 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
   }
 
   Future<String> getNetworkingStateData() async {
-    final networkingStateData = await callBluetoothSDK.getNetworkingStateData();
+    var networkingStateData = await callBluetoothSDK.getNetworkingStateData();
     print("networkingStateData====$networkingStateData");
     networkingStateResultType = networkingStateData.substring(0, 1);
     statusStr = networkingStateResultType == "0" ? "Connected" : "Disconnected";
@@ -85,7 +85,7 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
   }
 
   Future<String> getDeviceConfigData() async {
-    final configData = await callBluetoothSDK.getDeviceConfigData();
+    var configData = await callBluetoothSDK.getDeviceConfigData();
     macAddressStr = configData.substring(2);
     var resultCode = configData.substring(0, 1);
     print("configData===$configData");
