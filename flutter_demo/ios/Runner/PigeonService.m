@@ -51,7 +51,7 @@
 - (void)getDeviceNamesWithCompletion:(nonnull void (^)(NSArray<NSString *> * _Nullable, FlutterError * _Nullable))completion {
     NSArray *arr = self.names;
     completion(arr,nil);
-//    NSLog(@"iOS----%@",arr);
+    //    NSLog(@"iOS----%@",arr);
 }
 - (void)startConnectPeripheralWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
     [[CDBleManager shareManager] startConnectPeripheral:self.connectPeripheral];
@@ -182,7 +182,7 @@
     NSLog(@"iOS: 蓝牙开启与关闭状态:*****%ld",(long)state);
 }
 - (void)cdbleManager:(CDBleManager*_Nullable)cdbleManager didDiscoverPeripheral:(CBPeripheral*_Nullable)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *_Nullable)RSSI {
-//    NSString *peripheralName = advertisementData[@"kCBAdvDataLocalName"];
+    //    NSString *peripheralName = advertisementData[@"kCBAdvDataLocalName"];
     if (peripheral.name == nil) {
         return;
     }
@@ -275,10 +275,10 @@
 - (NSString*) convertObjectToJson:(NSObject*) object
 {
     NSError *writeError = nil;
-
+    
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:object options:NSJSONWritingPrettyPrinted error:&writeError];
     NSString *result = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-
+    
     return result;
 }
 - (NSArray <NSString *>*)toArrFromStr:(NSString *)str{
@@ -296,7 +296,7 @@
  * - (void)queryEnableConfigRFID{
  [[CDBleManager shareManager] queryEnableConfigWithError:^(NSError * _Nullable error) {
  }];
-}
+ }
  */
 
 /**
@@ -304,9 +304,9 @@
  * params: 只使用 1 字节,只传入 1 个字节 8 bit 数据
  * -(void)enableConfig{
  [[CDBleManager shareManager] enableConfigWithParams:nil error:^(NSError * _Nullable error) {
-
+ 
  }];
-}
+ }
  */
 
 // 获取系统信息
