@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
 
 class OCPPServerConfigurePage extends StatefulWidget {
-  const OCPPServerConfigurePage({Key? key}) : super(key: key);
+  final Map arguments;
+  const OCPPServerConfigurePage({Key? key, required this.arguments})
+      : super(key: key);
   @override
   _OCPPServerConfigurePageState createState() =>
       _OCPPServerConfigurePageState();
@@ -68,6 +70,8 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
   bool isEditor = false;
   bool isShowProcess = true;
   bool isHideConfigBtn = false;
+  String domainStr = "";
+  // String domainSuffixStr = "";
 
   @override
   void initState() {
@@ -75,13 +79,16 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
     // editorFocusNode.canRequestFocus = false;
     // SystemChannels.textInput.invokeMethod('TextInput.hide');
     queryEnableConfig();
-    String textStr = "TACW2240320T0023";
-    editorController.text = textStr;
-
+    queryOCPPConfigParams();
     editorController.value = TextEditingValue(
-        text: textStr,
-        selection: TextSelection.fromPosition(TextPosition(
-            affinity: TextAffinity.downstream, offset: textStr.length)));
+      text: editorController.text,
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          affinity: TextAffinity.downstream,
+          offset: editorController.text.length,
+        ),
+      ),
+    );
     editorFocusNode.addListener(() {
       if (editorFocusNode.hasFocus == true) {
         setState(() {
@@ -165,7 +172,7 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
 
   Future<void> editorClickAction() async {
     setState(() {
-      print("dianji");
+      print("点击了编辑按钮");
       isEditor = true;
     });
   }
@@ -240,6 +247,28 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
         }
       });
       print('Flutter------$value');
+    });
+  }
+
+  Future<void> queryOCPPConfigParams() async {
+    callBluetoothSDK.queryOCPPConfigParams();
+    delayedGetDomainSuffix();
+  }
+
+  void delayedGetDomainSuffix() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      // getOCPPConfigParams();
+      callBluetoothSDK.getDomain().then((value) => {
+            setState(() {
+              domainStr = value;
+            })
+          });
+      callBluetoothSDK.getDomainSuffix().then((value) => {
+            setState(() {
+              editorController.text = value;
+            })
+          });
+      return Future.value("延时4秒执行");
     });
   }
 
@@ -390,6 +419,7 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
               },
               enableInteractiveSelection: isEditor,
               decoration: const InputDecoration(
+                hintText: "E-mail address",
                 border: InputBorder.none,
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -636,17 +666,17 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
                             children: [
                               textWidget(15.0, FontWeight.w600, "Serial Number",
                                   20, 20, Colors.black),
-                              textWidget(15.0, FontWeight.w500,
-                                  "TACW22-4-0320-T0023", 20, 30, Colors.black),
-                              textWidget(15.0, FontWeight.w600, "Server Info",
-                                  20, 30, Colors.black),
                               textWidget(
                                   15.0,
-                                  FontWeight.normal,
-                                  "https://new.evsync.com",
+                                  FontWeight.w500,
+                                  widget.arguments["deviceNumber"],
                                   20,
                                   30,
                                   Colors.black),
+                              textWidget(15.0, FontWeight.w600, "Server Info",
+                                  20, 30, Colors.black),
+                              textWidget(15.0, FontWeight.normal, domainStr, 20,
+                                  30, Colors.black),
                               heightLineWidget(
                                   20, 14, 20, Colors.grey.shade400),
                               renamingWidget(),

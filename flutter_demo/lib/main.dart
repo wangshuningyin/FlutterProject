@@ -61,11 +61,12 @@ class _MyAppState extends State<MyApp> {
     Routes.chargerLinkPage: (BuildContext context) => const ChargerLinkPage(),
     Routes.deviceInfoPage: (BuildContext context, {arguments}) =>
         DeviceInfoPage(arguments: arguments),
-    Routes.ocppServerPage: (BuildContext context) => const OCPPServerPage(),
+    Routes.ocppServerPage: (BuildContext context, {arguments}) =>
+        OCPPServerPage(arguments: arguments),
     Routes.ocppServerDownLoadPage: (BuildContext context) =>
         const OCPPServerDownLoadPage(),
-    Routes.ocppServerConfigurePage: (BuildContext context) =>
-        const OCPPServerConfigurePage(),
+    Routes.ocppServerConfigurePage: (BuildContext context, {arguments}) =>
+        OCPPServerConfigurePage(arguments: arguments),
     Routes.modbusModePage: (BuildContext context) => const ModbusModePage(),
     Routes.modbusChargerPage: (BuildContext context, {arguments}) =>
         ModbusChargerPage(arguments: arguments),

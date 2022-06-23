@@ -258,7 +258,15 @@ class _HomePageState extends State<HomePage> {
                         else if (i == 4)
                           {Navigator.pushNamed(context, Routes.chargerLinkPage)}
                         else if (i == 5)
-                          {Navigator.pushNamed(context, Routes.ocppServerPage)}
+                          {
+                            Navigator.pushNamed(
+                              context,
+                              Routes.ocppServerPage,
+                              arguments: {
+                                "deviceNumber": deviceNumber,
+                              },
+                            )
+                          }
                         else if (i == 6)
                           {
                             Navigator.pushNamed(

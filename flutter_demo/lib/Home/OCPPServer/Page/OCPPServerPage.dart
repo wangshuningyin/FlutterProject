@@ -6,7 +6,8 @@ import 'package:flutter_demo/Utils/LoadingUtils.dart';
 import 'package:flutter_demo/Utils/DatabaseHelper.dart';
 
 class OCPPServerPage extends StatefulWidget {
-  const OCPPServerPage({Key? key}) : super(key: key);
+  final Map arguments;
+  const OCPPServerPage({Key? key, required this.arguments}) : super(key: key);
   @override
   _OCPPServerPageState createState() => _OCPPServerPageState();
 }
@@ -271,7 +272,13 @@ class _OCPPServerPageState extends State<OCPPServerPage> {
   }
 
   _seletedData() {
-    Navigator.pushNamed(context, Routes.ocppServerConfigurePage);
+    Navigator.pushNamed(
+      context,
+      Routes.ocppServerConfigurePage,
+      arguments: {
+        "deviceNumber": widget.arguments["deviceNumber"],
+      },
+    );
   }
 
   Function()? _deleteAction() {
