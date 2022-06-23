@@ -68,7 +68,9 @@ NSObject<FlutterMessageCodec> *FLTCallBluetoothSDKGetCodec(void);
 /// @return `nil` only when `error != nil`.
 - (void)getDeviceConfigDataWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
-- (void)getOCPPConfigParamsWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
+- (void)getDomainWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)getDomainSuffixWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 @end
 
 extern void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTCallBluetoothSDK> *_Nullable api);

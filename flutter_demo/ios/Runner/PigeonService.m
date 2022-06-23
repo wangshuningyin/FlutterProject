@@ -159,7 +159,11 @@
     }];
 }
 
-- (void)getOCPPConfigParamsWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
+- (void)getDomainSuffixWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
+    completion(self.domainSuffix,nil);
+}
+
+- (void)getDomainWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
     completion(self.domain,nil);
 }
 
@@ -239,7 +243,8 @@
             }else if(dataModel.ocppConfigParamsModel){
                 NSLog(@"iOS: ocppConfigParamsModel====%@",dataModel.ocppConfigParamsModel.domain);
                 self.domain = dataModel.ocppConfigParamsModel.domain;
-                [self getOCPPConfigParamsWithCompletion:^(NSString * _Nullable str, FlutterError * _Nullable error) {
+                self.domainSuffix = dataModel.ocppConfigParamsModel.domainSuffix;
+                [self getDomainWithCompletion:^(NSString * _Nullable str, FlutterError * _Nullable error) {
                     str = self.domain;
                 }];
             }else if (dataModel.networkingState){

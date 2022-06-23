@@ -516,13 +516,31 @@ void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObje
   {
     FlutterBasicMessageChannel *channel =
       [FlutterBasicMessageChannel
-        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.getOCPPConfigParams"
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.getDomain"
         binaryMessenger:binaryMessenger
         codec:FLTCallBluetoothSDKGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(getOCPPConfigParamsWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(getOCPPConfigParamsWithCompletion:)", api);
+      NSCAssert([api respondsToSelector:@selector(getDomainWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(getDomainWithCompletion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
-        [api getOCPPConfigParamsWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+        [api getDomainWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.getDomainSuffix"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getDomainSuffixWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(getDomainSuffixWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getDomainSuffixWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
           callback(wrapResult(output, error));
         }];
       }];

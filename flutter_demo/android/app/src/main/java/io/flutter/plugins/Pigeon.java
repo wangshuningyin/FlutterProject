@@ -102,7 +102,8 @@ public class Pigeon {
     void queryOCPPConfigParams(Result<Void> result);
     void getNetworkingStateData(Result<String> result);
     void getDeviceConfigData(Result<String> result);
-    void getOCPPConfigParams(Result<String> result);
+    void getDomain(Result<String> result);
+    void getDomainSuffix(Result<String> result);
 
     /** The codec used by CallBluetoothSDK. */
     static MessageCodec<Object> getCodec() {
@@ -761,7 +762,7 @@ public class Pigeon {
       }
       {
         BasicMessageChannel<Object> channel =
-            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.getOCPPConfigParams", getCodec());
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.getDomain", getCodec());
         if (api != null) {
           channel.setMessageHandler((message, reply) -> {
             Map<String, Object> wrapped = new HashMap<>();
@@ -777,7 +778,36 @@ public class Pigeon {
                 }
               };
 
-              api.getOCPPConfigParams(resultCallback);
+              api.getDomain(resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.getDomainSuffix", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<String> resultCallback = new Result<String>() {
+                public void success(String result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.getDomainSuffix(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

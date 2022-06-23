@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy  )NSString *deviceConfigStr;
 @property(nonatomic, copy  )NSString *domain;
 @property(nonatomic, assign)BOOL isEnableSuccess;
-
+@property(nonatomic,copy)NSString *domainSuffix;
 @end
 
 NS_ASSUME_NONNULL_END
