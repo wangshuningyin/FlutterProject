@@ -57,6 +57,10 @@ abstract class CallBluetoothSDK {
   String getDomain();
   @async
   String getDomainSuffix();
+  @async
+  void requestOCPPConfigParams(String ocppConfigParams);
+  @async
+  bool isRequestOCPPConfigParamsSuccess();
 }
 
 // 原生调用 Flutter 方法1

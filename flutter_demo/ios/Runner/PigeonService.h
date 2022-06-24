@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy  )NSString *domain;
 @property(nonatomic, assign)BOOL isEnableSuccess;
 @property(nonatomic,copy)NSString *domainSuffix;
+@property(nonatomic,copy)NSString *currentVersion;
+@property(nonatomic, assign)BOOL isRequestOCPPConfigParamsSuccess;
 @end
 
 NS_ASSUME_NONNULL_END
