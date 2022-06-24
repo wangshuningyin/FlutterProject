@@ -34,14 +34,18 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
   void initState() {
     super.initState();
     queryOCPPConfigParams();
-    _getSessionId().then((value) {
-      _getDevice(widget.arguments["deviceNumber"]);
-    });
   }
 
   Future<void> queryOCPPConfigParams() async {
     callBluetoothSDK.queryOCPPConfigParams();
-    getDomain();
+    delayedGetDomain();
+  }
+
+  void delayedGetDomain() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      getDomain();
+      return Future.value("延时4秒执行");
+    });
   }
 
   Future<String> getDomain() async {
@@ -81,12 +85,22 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
 
   Future<void> queryDeviceConfigType() async {
     callBluetoothSDK.queryDeviceConfigType();
-    getDeviceConfigData();
+    delayedGetDeviceConfigData();
+  }
+
+  void delayedGetDeviceConfigData() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      getDeviceConfigData();
+      ;
+      return Future.value("延时4秒执行");
+    });
   }
 
   Future<String> getDeviceConfigData() async {
     var configData = await callBluetoothSDK.getDeviceConfigData();
-    macAddressStr = configData.substring(2);
+    setState(() {
+      macAddressStr = configData.substring(2);
+    });
     var resultCode = configData.substring(0, 1);
     print("configData===$configData");
     if (networkModelCode == "0" ||
@@ -96,6 +110,9 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
     } else {
       isShowMacAddress = true;
     }
+    _getSessionId().then((value) {
+      _getDevice(widget.arguments["deviceNumber"]);
+    });
     return configData;
   }
 
