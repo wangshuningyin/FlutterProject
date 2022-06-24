@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
+import 'package:flutter_demo/Home/OCPPServer/Model/OCPPServerModel.dart';
 
 class OCPPServerConfigurePage extends StatefulWidget {
   final Map arguments;
@@ -71,13 +73,16 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
   bool isShowProcess = true;
   bool isHideConfigBtn = false;
   String domainStr = "";
+  bool isRequestOCPPConfigParamsSuccess = false;
+  late OCPPServerModel ocppServerModel;
   // String domainSuffixStr = "";
 
   @override
   void initState() {
-    // editorFocusNode.unfocus();
-    // editorFocusNode.canRequestFocus = false;
-    // SystemChannels.textInput.invokeMethod('TextInput.hide');
+    setState(() {
+      ocppServerModel = widget.arguments["selectedCurrentModel"];
+      domainStr = ocppServerModel.location;
+    });
     queryEnableConfig();
     queryOCPPConfigParams();
     editorController.value = TextEditingValue(
@@ -179,47 +184,10 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
 
   @override
   void dispose() {
+    identifyAnimationController.dispose();
+    uploadAnimationController.dispose();
+    processController.dispose();
     super.dispose();
-  }
-
-  myTimer() {
-    // 定义一个函数，将定时器包裹起来
-    var counter = 9;
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      print(timer.tick);
-      identifyAnimationController.forward();
-      counter--;
-      if (counter == 6) {
-        print('Cancel timer');
-        identifyAnimationController.stop();
-        uploadAnimationController.forward();
-        setState(() {
-          identifyColor = const Color.fromARGB(229, 61, 33, 243);
-          identifyBigImageName = identifyBgCompelete;
-          identifySmallImageName = identifySmallSuccess;
-          uploadBigImageName = identifyBgLoading;
-          uploadSmallImageName = uploadSmallCompelete;
-        });
-      } else if (counter == 3) {
-        uploadAnimationController.stop();
-        processController.forward();
-        setState(() {
-          uploadColor = const Color.fromARGB(229, 61, 33, 243);
-          uploadBigImageName = identifyBgCompelete;
-          uploadSmallImageName = identifySmallSuccess;
-          processBigImageName = identifyBgLoading;
-          processSmallImageName = processSmallCompelete;
-        });
-        // timer.cancel();
-      } else if (counter == 0) {
-        setState(() {
-          processColor = const Color.fromARGB(229, 61, 33, 243);
-          processBigImageName = identifyBgCompelete;
-          processSmallImageName = identifySmallSuccess;
-        });
-        timer.cancel();
-      }
-    });
   }
 
   Future<void> queryEnableConfig() async {
@@ -256,19 +224,102 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
   }
 
   void delayedGetDomainSuffix() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      // getOCPPConfigParams();
-      callBluetoothSDK.getDomain().then((value) => {
-            setState(() {
-              domainStr = value;
-            })
-          });
+    Future.delayed(const Duration(milliseconds: 800), () {
+      // callBluetoothSDK.getDomain().then((value) => {
+      //       setState(() {
+      //         domainStr = value;
+      //       })
+      //     });
       callBluetoothSDK.getDomainSuffix().then((value) => {
             setState(() {
               editorController.text = value;
             })
           });
       return Future.value("延时4秒执行");
+    });
+  }
+
+  Future<void> requestOCPPConfigParams() async {
+    callBluetoothSDK.requestOCPPConfigParams(
+        "${widget.arguments["jsonStr"]}#${editorController.text}");
+    delayedGetRequestOCPPConfigParamsSuccess();
+  }
+
+  void delayedGetRequestOCPPConfigParamsSuccess() {
+    Future.delayed(const Duration(milliseconds: 800), () {
+      callBluetoothSDK.isRequestOCPPConfigParamsSuccess().then((value) => {
+            setState(() {
+              isRequestOCPPConfigParamsSuccess = value;
+            })
+          });
+      return Future.value("延时4秒执行");
+    });
+  }
+
+  void configureAction() {
+    requestOCPPConfigParams();
+    setState(() {
+      isShowProcess = false;
+      isHideConfigBtn = false;
+      scrollController.jumpTo(200);
+    });
+    myTimer();
+  }
+
+  myTimer() {
+    // 定义一个函数，将定时器包裹起来
+    var counter = 9;
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      print(timer.tick);
+      identifyAnimationController.forward();
+      counter--;
+      if (counter == 6) {
+        print('Cancel timer');
+        identifyAnimationController.stop();
+        uploadAnimationController.forward();
+        setState(() {
+          identifyColor = const Color.fromARGB(229, 61, 33, 243);
+          identifyBigImageName = identifyBgCompelete;
+          identifySmallImageName = identifySmallSuccess;
+          uploadBigImageName = identifyBgLoading;
+          uploadSmallImageName = uploadSmallCompelete;
+        });
+      } else if (counter == 3) {
+        uploadAnimationController.stop();
+        processController.forward();
+        setState(() {
+          uploadColor = const Color.fromARGB(229, 61, 33, 243);
+          uploadBigImageName = identifyBgCompelete;
+          uploadSmallImageName = identifySmallSuccess;
+          processBigImageName = identifyBgLoading;
+          processSmallImageName = processSmallCompelete;
+        });
+        // timer.cancel();
+      } else if (counter == 0) {
+        if (isRequestOCPPConfigParamsSuccess) {
+          setState(() {
+            processColor = const Color.fromARGB(229, 61, 33, 243);
+            processBigImageName = identifyBgCompelete;
+            processSmallImageName = identifySmallSuccess;
+          });
+        } else {
+          setState(() {
+            processColor = Colors.red;
+            processBigImageName = identifyBgError;
+            processSmallImageName = identifySmallError;
+          });
+        }
+
+        timer.cancel();
+      }
+    });
+  }
+
+  void okAction() {
+    setState(() {
+      isShowProcess = true;
+      isHideConfigBtn = true;
+      scrollController.jumpTo(0);
     });
   }
 
@@ -595,26 +646,6 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
         ),
       ),
     );
-  }
-
-  void configureAction() {
-    setState(() {
-      isShowProcess = false;
-      isHideConfigBtn = true;
-      scrollController.jumpTo(200);
-      //   scrollController.animateTo(200.0,
-      //       duration: const Duration(milliseconds: 1), curve: Curves.easeIn);
-    });
-    myTimer();
-    print("objectToJson(UserInfo())");
-  }
-
-  void okAction() {
-    setState(() {
-      isShowProcess = true;
-      isHideConfigBtn = false;
-      scrollController.jumpTo(0);
-    });
   }
 
   @override

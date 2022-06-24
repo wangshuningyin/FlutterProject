@@ -2,6 +2,8 @@ import 'dart:convert';
 
 OCPPServerModel ocppServerModelFromJson(String str) =>
     OCPPServerModel.fromMap(json.decode(str));
+String ocppServerModelToJson(OCPPServerModel data) =>
+    json.encode(data.toJson());
 
 class OCPPServerModel {
   OCPPServerModel(
@@ -104,4 +106,22 @@ class OCPPServerModel {
     _url = map["url"];
     _isSelected = map["isSelected"];
   }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "domain": domain,
+        "port": port,
+        "type": type,
+        "version": version,
+        "tls": tls,
+        "execute": execute,
+        "certId": certId,
+        "passphrase": passphrase,
+        "passSupprot": passSupprot,
+        "aliasNumber": aliasNumber,
+        "location": location,
+        "applyVersion": applyVersion,
+        "code": code,
+        "url": url,
+      };
 }

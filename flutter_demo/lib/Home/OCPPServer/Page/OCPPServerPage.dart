@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/Home/OCPPServer/Model/OCPPServerModel.dart';
 import 'package:flutter_demo/Utils/routes.dart';
 import 'package:flutter_demo/Utils/LoadingUtils.dart';
 import 'package:flutter_demo/Utils/DatabaseHelper.dart';
@@ -19,7 +20,7 @@ class _OCPPServerPageState extends State<OCPPServerPage> {
 
   int currentIndex = 0;
   var selectedCurrentModel;
-
+  var jsonStr = "";
   String imageName = delecteIcon;
   String buttonText = "Next";
   Color btnBackgorondColor = Colors.grey.shade300;
@@ -167,6 +168,8 @@ class _OCPPServerPageState extends State<OCPPServerPage> {
               print("Next $i $isCancleIconSelected");
               currentIndex = i;
               selectedCurrentModel = ocppServerModelList[currentIndex];
+              jsonStr = ocppServerModelToJson(selectedCurrentModel);
+              print(jsonStr);
               for (int i = 0; i < ocppServerModelList.length; i++) {
                 if (i != currentIndex) {
                   setState(() {
@@ -277,6 +280,8 @@ class _OCPPServerPageState extends State<OCPPServerPage> {
       Routes.ocppServerConfigurePage,
       arguments: {
         "deviceNumber": widget.arguments["deviceNumber"],
+        "jsonStr": jsonStr,
+        "selectedCurrentModel": selectedCurrentModel,
       },
     );
   }
