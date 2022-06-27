@@ -256,7 +256,15 @@ class _HomePageState extends State<HomePage> {
                         else if (i == 3)
                           {Navigator.pushNamed(context, Routes.updatePage)}
                         else if (i == 4)
-                          {Navigator.pushNamed(context, Routes.chargerLinkPage)}
+                          {
+                            Navigator.pushNamed(
+                              context,
+                              Routes.chargerLinkPage,
+                              arguments: {
+                                "deviceNumber": deviceNumber,
+                              },
+                            )
+                          }
                         else if (i == 5)
                           {
                             Navigator.pushNamed(

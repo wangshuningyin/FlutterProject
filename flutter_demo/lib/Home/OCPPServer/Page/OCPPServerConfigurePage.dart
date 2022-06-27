@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
 import 'package:flutter_demo/Home/OCPPServer/Model/OCPPServerModel.dart';
 

@@ -58,7 +58,8 @@ class _MyAppState extends State<MyApp> {
     Routes.personCenterPage: (BuildContext context) =>
         const PersonalCenterPage(),
     Routes.deviceMode: (BuildContext context) => const DeviceModePage(),
-    Routes.chargerLinkPage: (BuildContext context) => const ChargerLinkPage(),
+    Routes.chargerLinkPage: (BuildContext context, {arguments}) =>
+        ChargerLinkPage(arguments: arguments),
     Routes.deviceInfoPage: (BuildContext context, {arguments}) =>
         DeviceInfoPage(arguments: arguments),
     Routes.ocppServerPage: (BuildContext context, {arguments}) =>

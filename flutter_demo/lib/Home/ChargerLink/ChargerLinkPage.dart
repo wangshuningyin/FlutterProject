@@ -1,14 +1,22 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
+import 'package:flutter_demo/Home/DeviceInfo/DeviceInfoModel.dart';
+import 'package:flutter_demo/NetWorkApi/NetWorkApiRequest.dart';
+import 'package:flutter_demo/Utils/LoadingUtils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChargerLinkPage extends StatefulWidget {
-  const ChargerLinkPage({Key? key}) : super(key: key);
+  final Map arguments;
+  const ChargerLinkPage({Key? key, required this.arguments}) : super(key: key);
   @override
   State<ChargerLinkPage> createState() => _ChargerLinkPageState();
 }
 
 class _ChargerLinkPageState extends State<ChargerLinkPage> {
+  final callBluetoothSDK = CallBluetoothSDK();
+
   static const String switchOff = "lib/images/3.0x/switch_off@3x.png";
   static const String switchOn = "lib/images/3.0x/switch_on@3x.png";
 
@@ -28,85 +36,248 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
   String offlineImageName = switchOff;
 
   bool wifiOffstage = true;
+  bool wifiState = false;
   bool fourGOffstage = true;
+  bool lanOffstage = true;
+  bool offlineOffstage = true;
 
-  Future<void> queryEnableConfig() async {
+  String networkingStateResultType = "";
+  String networkModelCode = "";
+
+  String sessionId = '';
+
+  Future<void> queryConfigSSIDParams() async {
     final callBluetoothSDK = CallBluetoothSDK();
-    callBluetoothSDK.queryEnableConfig();
-    getEnable();
-    print('Flutter2------free vending使能查询成功');
+    callBluetoothSDK.queryConfigSSIDParams();
+    print('Flutter查询成功ConfigSSIDParams功能');
   }
 
-  Future<void> getEnable() async {
+  Future<void> queryConfigAPNParams() async {
     final callBluetoothSDK = CallBluetoothSDK();
-    callBluetoothSDK.getFreeVendingEnable().then((value) {
-      isWifiSelected = value;
-      setState(() {
-        if (isWifiSelected) {
-          wifiImageName = switchOn;
-          wifiOffstage = false;
-        } else {
-          wifiImageName = switchOff;
-          wifiOffstage = true;
-        }
-      });
-      print('Flutter2------$value');
-    });
+    callBluetoothSDK.queryConfigAPNParams();
+    print('Flutter--查询成功ConfigAPNParams功能');
+  }
+
+  Future<void> ceAuthenticationWithParams() async {
+    final callBluetoothSDK = CallBluetoothSDK();
+    callBluetoothSDK.ceAuthenticationWithParams();
+    print('Flutter--ceAuthenticationWithParams功能配置');
   }
 
   @override
   void initState() {
     super.initState();
     if (Platform.isIOS) {
-      queryEnableConfig();
+      _getSessionId().then((value) {
+        _getDevice(widget.arguments['deviceNumber']);
+      });
+      queryNetworkState();
+      queryConfigSSIDParams();
+      queryConfigAPNParams();
+      ceAuthenticationWithParams();
     }
+  }
+
+  Future<void> queryNetworkState() async {
+    callBluetoothSDK.queryNetworkState();
+    getNetworkingStateData();
+  }
+
+  Future<String> getNetworkingStateData() async {
+    var networkingStateData = await callBluetoothSDK.getNetworkingStateData();
+    print("networkingStateData====$networkingStateData");
+    networkingStateResultType = networkingStateData.substring(0, 1);
+    networkModelCode = networkingStateData.substring(1);
+    if (networkModelCode == "0") {
+      setState(() {
+        // Offline
+        isOfflineSelected = true;
+        offlineImageName = switchOn;
+
+        isFourGSelected = false;
+        fourGImageName = switchOff;
+
+        isLanSelected = false;
+        lanImageName = switchOff;
+
+        isWifiSelected = false;
+        wifiImageName = switchOff;
+      });
+    } else if (networkModelCode == "1") {
+      setState(() {
+        // WiFi
+        isWifiSelected = true;
+        wifiImageName = switchOn;
+
+        isOfflineSelected = false;
+        offlineImageName = switchOff;
+
+        isFourGSelected = false;
+        fourGImageName = switchOff;
+
+        isLanSelected = false;
+        lanImageName = switchOff;
+      });
+    } else if (networkModelCode == "2") {
+      setState(() {
+        // LAN
+        isLanSelected = true;
+        lanImageName = switchOn;
+
+        isOfflineSelected = false;
+        offlineImageName = switchOff;
+
+        isFourGSelected = false;
+        fourGImageName = switchOff;
+
+        isWifiSelected = false;
+        wifiImageName = switchOff;
+      });
+    } else if (networkModelCode == "4") {
+      setState(() {
+        // 4G
+        isFourGSelected = true;
+        fourGImageName = switchOn;
+
+        isOfflineSelected = false;
+        offlineImageName = switchOff;
+
+        isLanSelected = false;
+        lanImageName = switchOff;
+
+        isWifiSelected = false;
+        wifiImageName = switchOff;
+      });
+    }
+    return networkingStateData;
   }
 
   _wifiClickAction() {
     setState(() {
-      isWifiSelected = !isWifiSelected;
-      if (isWifiSelected) {
+      if (!isWifiSelected) {
         wifiImageName = switchOn;
-        wifiOffstage = false;
-      } else {
-        wifiImageName = switchOff;
-        wifiOffstage = true;
+        fourGImageName = switchOff;
+        lanImageName = switchOff;
+        offlineImageName = switchOff;
+        isOfflineSelected = false;
+        isFourGSelected = false;
+        isLanSelected = false;
+        wifiState = false;
       }
     });
   }
 
   _fourGClickAction() {
     setState(() {
-      isFourGSelected = !isFourGSelected;
+      // isFourGSelected = !isFourGSelected;
       if (!isFourGSelected) {
         fourGImageName = switchOn;
-        fourGOffstage = false;
-      } else {
-        fourGImageName = switchOff;
-        fourGOffstage = true;
+        wifiImageName = switchOff;
+        lanImageName = switchOff;
+        offlineImageName = switchOff;
+        isOfflineSelected = false;
+        isWifiSelected = false;
+        isLanSelected = false;
+        wifiState = true;
       }
+      // else {
+      //   fourGImageName = switchOff;
+      //   fourGOffstage = true;
+      // }
     });
   }
 
   _lanClickAction() {
     setState(() {
-      isLanSelected = !isLanSelected;
+      // isLanSelected = !isLanSelected;
       if (!isLanSelected) {
         lanImageName = switchOn;
-      } else {
-        lanImageName = switchOff;
+        wifiImageName = switchOff;
+        fourGImageName = switchOff;
+        offlineImageName = switchOff;
+        isOfflineSelected = false;
+        isWifiSelected = false;
+        isFourGSelected = false;
+        wifiState = true;
       }
+      // else {
+      //   lanImageName = switchOff;
+      // }
     });
   }
 
   _offlineClickAction() {
     setState(() {
-      isOfflineSelected = !isOfflineSelected;
+      // isOfflineSelected = !isOfflineSelected;
       if (!isOfflineSelected) {
         offlineImageName = switchOn;
-      } else {
-        offlineImageName = switchOff;
+        lanImageName = switchOff;
+        wifiImageName = switchOff;
+        fourGImageName = switchOff;
+        isLanSelected = false;
+        isWifiSelected = false;
+        isFourGSelected = false;
+        wifiState = true;
       }
+      // else {
+      //   offlineImageName = switchOff;
+      // }
+    });
+  }
+
+  Future<void> _getSessionId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      var sessionIdStr = prefs.getString('sessionId') ?? "";
+      sessionId = sessionIdStr;
+    });
+  }
+
+  _getDevice(String code) {
+    print("====$sessionId ====$code");
+    Map<String, String> parameter = {"deviceNumber": code};
+
+    NetWorkApiRequest.getDevice(sessionId, parameter).then((value) async {
+      if (value != null && value['code'] == 0) {
+        setState(() {
+          List data = [];
+          String str = json.encode(value);
+          var ocppServerModel = deviceInfoModelFromJson(str);
+          var netModule = ocppServerModel.data.list.first.netModule;
+
+          if (netModule.contains("WIFI")) {
+            data.add("Wi-Fi");
+            setState(() {
+              wifiOffstage = false;
+              wifiState = true;
+            });
+          }
+          if (netModule.contains("4G")) {
+            data.add("4G");
+            setState(() {
+              fourGOffstage = false;
+            });
+          }
+          if (netModule.contains("LAN")) {
+            data.add("LAN");
+            setState(() {
+              lanOffstage = false;
+            });
+          }
+          if (data.length > 1) {
+            data.add('Offline');
+            setState(() {
+              offlineOffstage = false;
+            });
+          }
+          print(str);
+        });
+      } else {
+        LoadingUtils.showToast(value['msg']);
+      }
+    }).catchError((e) {
+      //失败
+      LoadingUtils.showToast(e.toString());
     });
   }
 
@@ -278,12 +449,25 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
               ),
             ),
           ),
-          networkStatebuild(
-              wifiStr, "CHARGDOT 2.4G", wifiOffstage, context, wifiImageName),
-          networkStatebuild(fourGIStr, "APN Settings", fourGOffstage, context,
-              fourGImageName),
-          networkStatebuild(lanStr, "", true, context, lanImageName),
-          networkStatebuild(offlineIStr, "", true, context, offlineImageName),
+          Offstage(
+            offstage: wifiOffstage,
+            child: networkStatebuild(
+                wifiStr, "CHARGDOT 2.4G", wifiState, context, wifiImageName),
+          ),
+          Offstage(
+            offstage: fourGOffstage,
+            child: networkStatebuild(
+                fourGIStr, "APN Settings", false, context, fourGImageName),
+          ),
+          Offstage(
+            offstage: lanOffstage,
+            child: networkStatebuild(lanStr, "", true, context, lanImageName),
+          ),
+          Offstage(
+            offstage: offlineOffstage,
+            child: networkStatebuild(
+                offlineIStr, "", true, context, offlineImageName),
+          ),
         ],
       ),
     );
