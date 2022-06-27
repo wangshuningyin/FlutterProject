@@ -31,9 +31,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy  )NSString *deviceConfigStr;
 @property(nonatomic, copy  )NSString *domain;
 @property(nonatomic, assign)BOOL isEnableSuccess;
-@property(nonatomic,copy)NSString *domainSuffix;
-@property(nonatomic,copy)NSString *currentVersion;
+@property(nonatomic, copy  )NSString *domainSuffix;
+@property(nonatomic, copy  )NSString *currentVersion;
 @property(nonatomic, assign)BOOL isRequestOCPPConfigParamsSuccess;
+@property(nonatomic, strong)NSMutableArray* basicInfoArr;
+@property(nonatomic, copy  )NSString *ssid;
+@property(nonatomic, copy  )NSString *apnParamsData;
 @end
 
 NS_ASSUME_NONNULL_END

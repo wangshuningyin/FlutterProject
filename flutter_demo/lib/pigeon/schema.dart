@@ -61,6 +61,16 @@ abstract class CallBluetoothSDK {
   void requestOCPPConfigParams(String ocppConfigParams);
   @async
   bool isRequestOCPPConfigParamsSuccess();
+  @async
+  void queryConfigSSIDParams();
+  @async
+  String getSSIDParamsData();
+  @async
+  void queryConfigAPNParams();
+  @async
+  String getAPNParamsData();
+  @async
+  void ceAuthenticationWithParams();
 }
 
 // 原生调用 Flutter 方法1

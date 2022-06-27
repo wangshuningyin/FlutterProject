@@ -75,6 +75,16 @@ NSObject<FlutterMessageCodec> *FLTCallBluetoothSDKGetCodec(void);
 - (void)requestOCPPConfigParamsOcppConfigParams:(nullable NSString *)ocppConfigParams completion:(void(^)(FlutterError *_Nullable))completion;
 /// @return `nil` only when `error != nil`.
 - (void)isRequestOCPPConfigParamsSuccessWithCompletion:(void(^)(NSNumber *_Nullable, FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)queryConfigSSIDParamsWithCompletion:(void(^)(FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)getSSIDParamsDataWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)queryConfigAPNParamsWithCompletion:(void(^)(FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)getAPNParamsDataWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
+/// @return `nil` only when `error != nil`.
+- (void)ceAuthenticationWithParamsWithCompletion:(void(^)(FlutterError *_Nullable))completion;
 @end
 
 extern void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTCallBluetoothSDK> *_Nullable api);
