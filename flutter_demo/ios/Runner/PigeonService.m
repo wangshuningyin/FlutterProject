@@ -10,6 +10,11 @@
 
 #define kOcppDir @"ocppDir"
 
+static NSString * const FunctionSupportWiFi         =  @"Wi-Fi";
+static NSString * const FunctionSupport4G           =  @"4G";
+static NSString * const FunctionSupportLAN          =  @"LAN";
+static NSString * const FunctionSupportOffline      =  @"Offline";
+
 @implementation PigeonService
 
 - (NSMutableArray *)peripherals {
@@ -255,33 +260,15 @@
 }
 
 /**
- * CE 认证配置
- * params   0 关    1 开
- 0 4G 使能
- 1 WIFI
- 2 NFC
- 3 LAN
- 4 故障灯语
- 5 循环自检
- 6
- 7
- */
-- (void)ceAuthenticationWithParamsWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
-    // @[@"4G 使能",@"WIFI 使能",@"NFC 使能",@"LAN 使能",@"故障灯语使用",@"循环自检使能"];
-    NSArray* defaultBasicInfoArr = @[@(0),@(0),@(1),@(0),@(0),@(0)];
-    self.basicInfoArr = [NSMutableArray arrayWithArray:defaultBasicInfoArr];
-    [[CDBleManager shareManager] CEAuthenticationWithParams:self.basicInfoArr error:^(NSError * _Nullable error) {
-        
-    }];
-}
-
-
-/**
  * 查询 APN 4G 模块 TCP/IP 参数
  */
 - (void)queryConfigAPNParamsWithCompletion:(nonnull void (^)(FlutterError * _Nullable))completion {
     [[CDBleManager shareManager] queryConfigAPNParamsWithError:^(NSError * _Nullable error) {
     }];
+}
+
+- (void)getAPNParamsDataWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
+    completion(self.apnParamsData,nil);
 }
 
 /**
@@ -293,18 +280,56 @@
     }];
 }
 
-- (void)getAPNParamsDataWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion { 
-    completion(self.apnParamsData,nil);
-}
-
 
 - (void)getSSIDParamsDataWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion { 
     completion(self.ssid,nil);
 }
 
+/**
+ * CE 认证配置
+ * params   0 关    1 开
+ 0 4G 使能
+ 1 WIFI
+ 2 NFC
+ 3 LAN
+ 4 故障灯语
+ 5 循环自检
+ 6
+ 7
+ */
+- (void)ceAuthenticationWithParamsAuthenticationParams:(nullable NSString *)authenticationParams completion:(nonnull void (^)(FlutterError * _Nullable))completion {
+    // @[@"4G 使能",@"WIFI 使能",@"NFC 使能",@"LAN 使能",@"故障灯语使用",@"循环自检使能"];
+    NSLog(@"iOS --- authenticationParams = %@",authenticationParams);
+    NSArray* defaultBasicInfoArr = @[@(0),@(0),@(1),@(0),@(0),@(0)];
+    self.basicInfoArr = [NSMutableArray arrayWithArray:defaultBasicInfoArr];
+    if ([authenticationParams isEqualToString:FunctionSupportWiFi]) {
+        self.basicInfoArr[0] = @(0);
+        self.basicInfoArr[1] = @(1);
+        self.basicInfoArr[3] = @(0);
+    } else if ([authenticationParams isEqualToString:FunctionSupport4G]) {
+        self.basicInfoArr[0] = @(1);
+        self.basicInfoArr[1] = @(0);
+        self.basicInfoArr[3] = @(0);
+    } else if ([authenticationParams isEqualToString:FunctionSupportLAN]){
+        self.basicInfoArr[0] = @(0);
+        self.basicInfoArr[1] = @(0);
+        self.basicInfoArr[3] = @(1);
+    } else if ([authenticationParams isEqualToString:FunctionSupportOffline]){
+        self.basicInfoArr[0] = @(0);
+        self.basicInfoArr[1] = @(0);
+        self.basicInfoArr[3] = @(0);
+    }
+    [[CDBleManager shareManager] CEAuthenticationWithParams:self.basicInfoArr error:^(NSError * _Nullable error) {
+        
+    }];
+    
+}
 
-
-
+- (void)isCEAuthenticationWithParamsSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
+    NSNumber* isCEAuthenticationSucces = [NSNumber numberWithBool:self.isCEAuthenticationSucces];
+    completion(isCEAuthenticationSucces,nil);
+    NSLog(@"iOS: self.isCEAuthenticationSucces === %d",self.isCEAuthenticationSucces);
+}
 
 #pragma mark -- CDBleManagerDelegate
 - (void)cdbleManagerCenterState:(CBManagerState)state{
@@ -393,17 +418,19 @@
                 self.isRequestOCPPConfigParamsSuccess = YES;
                 NSLog(@"iOS: isRequestOCPPConfigParamsSuccess－－－－－－－－%d",self.isRequestOCPPConfigParamsSuccess);
             }else if (dataModel.cmdType == CDBleCmdTypeCEAuthentication){
+                self.isCEAuthenticationSucces = YES;
                 NSLog(@"CDBleCmdTypeCEAuthentication请求成功");
             }else if (dataModel.apnParamsModel){
-                NSLog(@"apnParamsModel请求成功 %@",dataModel.apnParamsModel);
+                NSLog(@"apnParamsModel请求成功 %@, %ld",dataModel.apnParamsModel.imsi, dataModel.apnParamsModel.apnType);
                 self.apnParamsData = [NSString stringWithFormat:@"%ld,%@",dataModel.apnParamsModel.apnType, dataModel.apnParamsModel.imsi];
             }else if (dataModel.ssidModel){
-                NSLog(@"ssidModel请求成功%@",dataModel.ssidModel);
+                NSLog(@"ssidModel请求成功%@",dataModel.ssidModel.ssid);
                 self.ssid = dataModel.ssidModel.ssid;
             }
         }else{
             if (dataModel.cmdType == CDBleCmdTypeCEAuthentication){
                 NSLog(@"CDBleCmdTypeCEAuthentication请求失败");
+                self.isCEAuthenticationSucces = YES;
             }
         }
     }

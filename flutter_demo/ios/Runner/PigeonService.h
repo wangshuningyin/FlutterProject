@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong)NSMutableArray* basicInfoArr;
 @property(nonatomic, copy  )NSString *ssid;
 @property(nonatomic, copy  )NSString *apnParamsData;
+@property(nonatomic, assign)BOOL isCEAuthenticationSucces;
 @end
 
 NS_ASSUME_NONNULL_END

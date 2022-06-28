@@ -110,7 +110,8 @@ public class Pigeon {
     void getSSIDParamsData(Result<String> result);
     void queryConfigAPNParams(Result<Void> result);
     void getAPNParamsData(Result<String> result);
-    void ceAuthenticationWithParams(Result<Void> result);
+    void ceAuthenticationWithParams(String authenticationParams, Result<Void> result);
+    void isCEAuthenticationWithParamsSuccess(Result<Boolean> result);
 
     /** The codec used by CallBluetoothSDK. */
     static MessageCodec<Object> getCodec() {
@@ -1011,6 +1012,11 @@ public class Pigeon {
           channel.setMessageHandler((message, reply) -> {
             Map<String, Object> wrapped = new HashMap<>();
             try {
+              ArrayList<Object> args = (ArrayList<Object>)message;
+              String authenticationParamsArg = (String)args.get(0);
+              if (authenticationParamsArg == null) {
+                throw new NullPointerException("authenticationParamsArg unexpectedly null.");
+              }
               Result<Void> resultCallback = new Result<Void>() {
                 public void success(Void result) {
                   wrapped.put("result", null);
@@ -1022,7 +1028,36 @@ public class Pigeon {
                 }
               };
 
-              api.ceAuthenticationWithParams(resultCallback);
+              api.ceAuthenticationWithParams(authenticationParamsArg, resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.isCEAuthenticationWithParamsSuccess", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<Boolean> resultCallback = new Result<Boolean>() {
+                public void success(Boolean result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.isCEAuthenticationWithParamsSuccess(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

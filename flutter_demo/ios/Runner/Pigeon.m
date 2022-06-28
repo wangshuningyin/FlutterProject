@@ -666,10 +666,30 @@ void FLTCallBluetoothSDKSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObje
         binaryMessenger:binaryMessenger
         codec:FLTCallBluetoothSDKGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(ceAuthenticationWithParamsWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(ceAuthenticationWithParamsWithCompletion:)", api);
+      NSCAssert([api respondsToSelector:@selector(ceAuthenticationWithParamsAuthenticationParams:completion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(ceAuthenticationWithParamsAuthenticationParams:completion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
-        [api ceAuthenticationWithParamsWithCompletion:^(FlutterError *_Nullable error) {
+        NSArray *args = message;
+        NSString *arg_authenticationParams = args[0];
+        [api ceAuthenticationWithParamsAuthenticationParams:arg_authenticationParams completion:^(FlutterError *_Nullable error) {
           callback(wrapResult(nil, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.CallBluetoothSDK.isCEAuthenticationWithParamsSuccess"
+        binaryMessenger:binaryMessenger
+        codec:FLTCallBluetoothSDKGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(isCEAuthenticationWithParamsSuccessWithCompletion:)], @"FLTCallBluetoothSDK api (%@) doesn't respond to @selector(isCEAuthenticationWithParamsSuccessWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api isCEAuthenticationWithParamsSuccessWithCompletion:^(NSNumber *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
         }];
       }];
     }
