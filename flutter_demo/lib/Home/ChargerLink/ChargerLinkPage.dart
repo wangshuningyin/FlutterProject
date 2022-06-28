@@ -45,23 +45,145 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
   String networkModelCode = "";
 
   String sessionId = '';
-
+  String apnParamsData = '';
+  String ssid = '';
   Future<void> queryConfigSSIDParams() async {
-    final callBluetoothSDK = CallBluetoothSDK();
     callBluetoothSDK.queryConfigSSIDParams();
+    delayedGetSSIDParamsData();
     print('Flutter查询成功ConfigSSIDParams功能');
+  }
+
+  void delayedGetSSIDParamsData() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      getSSIDParamsData();
+      return Future.value("延时4秒执行");
+    });
+  }
+
+  Future<void> getSSIDParamsData() async {
+    callBluetoothSDK.getSSIDParamsData().then((value) => {
+          setState(() {
+            ssid = value;
+          }),
+          print('Flutter数据SSIDParamsData =$value 功能')
+        });
   }
 
   Future<void> queryConfigAPNParams() async {
     final callBluetoothSDK = CallBluetoothSDK();
     callBluetoothSDK.queryConfigAPNParams();
+    delayedGetAPNParamsData();
     print('Flutter--查询成功ConfigAPNParams功能');
   }
 
-  Future<void> ceAuthenticationWithParams() async {
+  void delayedGetAPNParamsData() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      getAPNParamsData();
+      return Future.value("延时4秒执行");
+    });
+  }
+
+  Future<void> getAPNParamsData() async {
+    callBluetoothSDK.getAPNParamsData().then((value) => {
+          setState(() {
+            apnParamsData = value;
+          }),
+          print('Flutter数据APNParamsData =$value 功能')
+        });
+  }
+
+  Future<void> ceAuthenticationWithParams(String authenticationParams) async {
     final callBluetoothSDK = CallBluetoothSDK();
-    callBluetoothSDK.ceAuthenticationWithParams();
+    callBluetoothSDK.ceAuthenticationWithParams(authenticationParams);
+    delayedGetCEAuthenticationWithParamsSuccess(authenticationParams);
     print('Flutter--ceAuthenticationWithParams功能配置');
+  }
+
+  void delayedGetCEAuthenticationWithParamsSuccess(
+      String authenticationParams) {
+    Future.delayed(const Duration(milliseconds: 800), () {
+      getCEAuthenticationWithParamsSuccess(authenticationParams);
+      return Future.value("延时8秒执行");
+    });
+  }
+
+  Future<void> getCEAuthenticationWithParamsSuccess(
+      String authenticationParams) async {
+    callBluetoothSDK.isCEAuthenticationWithParamsSuccess().then((value) => {
+          setState(() {
+            if (value) {
+              if (authenticationParams == wifiStr) {
+                wifiImageName = switchOn;
+                fourGImageName = switchOff;
+                lanImageName = switchOff;
+                offlineImageName = switchOff;
+                isOfflineSelected = false;
+                isFourGSelected = false;
+                isLanSelected = false;
+                wifiState = false;
+              }
+              if (authenticationParams == fourGIStr) {
+                fourGImageName = switchOn;
+                wifiImageName = switchOff;
+                lanImageName = switchOff;
+                offlineImageName = switchOff;
+                isOfflineSelected = false;
+                isWifiSelected = false;
+                isLanSelected = false;
+                wifiState = true;
+              }
+              if (authenticationParams == lanStr) {
+                lanImageName = switchOn;
+                wifiImageName = switchOff;
+                fourGImageName = switchOff;
+                offlineImageName = switchOff;
+                isOfflineSelected = false;
+                isWifiSelected = false;
+                isFourGSelected = false;
+                wifiState = true;
+              }
+              if (authenticationParams == offlineIStr) {
+                offlineImageName = switchOn;
+                lanImageName = switchOff;
+                wifiImageName = switchOff;
+                fourGImageName = switchOff;
+                isLanSelected = false;
+                isWifiSelected = false;
+                isFourGSelected = false;
+                wifiState = true;
+              }
+              LoadingUtils.showToast("Set Success");
+              callStopConnectPeripheral();
+            } else {
+              LoadingUtils.showToast("Set Failed");
+            }
+          }),
+          print('Flutter数据APNParamsData =$value 功能')
+        });
+  }
+
+  Future<void> callStopConnectPeripheral() async {
+    callBluetoothSDK.stopConnectPeripheral();
+    delayedStopConnectPeripheral();
+    print('Flutter2------开始连接蓝牙设备');
+  }
+
+  void delayedStopConnectPeripheral() {
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      callIsDisConnectPeripheralSuccess();
+      return Future.value("延时10秒执行");
+    });
+  }
+
+  Future<void> callIsDisConnectPeripheralSuccess() async {
+    callBluetoothSDK.isDisConnectPeripheralSuccess().then((value) => {
+          LoadingUtils.showToast(
+              "Bluetooth Disconnected.\nPlease connect charger."),
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            Navigator.pop(context, value);
+            return Future.value("延时10秒执行");
+          }),
+        });
   }
 
   @override
@@ -74,7 +196,6 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
       queryNetworkState();
       queryConfigSSIDParams();
       queryConfigAPNParams();
-      ceAuthenticationWithParams();
     }
   }
 
@@ -108,6 +229,7 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
         // WiFi
         isWifiSelected = true;
         wifiImageName = switchOn;
+        wifiState = false;
 
         isOfflineSelected = false;
         offlineImageName = switchOff;
@@ -153,76 +275,19 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
   }
 
   _wifiClickAction() {
-    setState(() {
-      if (!isWifiSelected) {
-        wifiImageName = switchOn;
-        fourGImageName = switchOff;
-        lanImageName = switchOff;
-        offlineImageName = switchOff;
-        isOfflineSelected = false;
-        isFourGSelected = false;
-        isLanSelected = false;
-        wifiState = false;
-      }
-    });
+    ceAuthenticationWithParams(wifiStr);
   }
 
   _fourGClickAction() {
-    setState(() {
-      // isFourGSelected = !isFourGSelected;
-      if (!isFourGSelected) {
-        fourGImageName = switchOn;
-        wifiImageName = switchOff;
-        lanImageName = switchOff;
-        offlineImageName = switchOff;
-        isOfflineSelected = false;
-        isWifiSelected = false;
-        isLanSelected = false;
-        wifiState = true;
-      }
-      // else {
-      //   fourGImageName = switchOff;
-      //   fourGOffstage = true;
-      // }
-    });
+    ceAuthenticationWithParams(fourGIStr);
   }
 
   _lanClickAction() {
-    setState(() {
-      // isLanSelected = !isLanSelected;
-      if (!isLanSelected) {
-        lanImageName = switchOn;
-        wifiImageName = switchOff;
-        fourGImageName = switchOff;
-        offlineImageName = switchOff;
-        isOfflineSelected = false;
-        isWifiSelected = false;
-        isFourGSelected = false;
-        wifiState = true;
-      }
-      // else {
-      //   lanImageName = switchOff;
-      // }
-    });
+    ceAuthenticationWithParams(lanStr);
   }
 
   _offlineClickAction() {
-    setState(() {
-      // isOfflineSelected = !isOfflineSelected;
-      if (!isOfflineSelected) {
-        offlineImageName = switchOn;
-        lanImageName = switchOff;
-        wifiImageName = switchOff;
-        fourGImageName = switchOff;
-        isLanSelected = false;
-        isWifiSelected = false;
-        isFourGSelected = false;
-        wifiState = true;
-      }
-      // else {
-      //   offlineImageName = switchOff;
-      // }
-    });
+    ceAuthenticationWithParams(offlineIStr);
   }
 
   Future<void> _getSessionId() async {
@@ -249,7 +314,11 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
             data.add("Wi-Fi");
             setState(() {
               wifiOffstage = false;
-              wifiState = true;
+              if (networkModelCode == "1") {
+                wifiState = false;
+              } else {
+                wifiState = true;
+              }
             });
           }
           if (netModule.contains("4G")) {
@@ -351,7 +420,11 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
                   // margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
                   child: InkWell(
                     onTap: () {
-                      _wifiClickAction();
+                      if (networkStateTxt == wifiStr) {
+                        print("设置网络");
+                      } else if (networkStateTxt == fourGIStr) {
+                        print("设置4g");
+                      }
                     },
                     child: const Icon(
                       Icons.arrow_forward_ios,
@@ -452,7 +525,7 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
           Offstage(
             offstage: wifiOffstage,
             child: networkStatebuild(
-                wifiStr, "CHARGDOT 2.4G", wifiState, context, wifiImageName),
+                wifiStr, ssid, wifiState, context, wifiImageName),
           ),
           Offstage(
             offstage: fourGOffstage,

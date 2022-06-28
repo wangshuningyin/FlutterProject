@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/Home/ChargerLink/ChargerLinkPage.dart';
 import 'package:flutter_demo/Home/YRunStateModel.dart';
 import 'package:flutter_demo/Utils/routes.dart';
 import 'package:flutter_demo/Utils/LoadingUtils.dart';
@@ -88,7 +89,7 @@ class _HomePageState extends State<HomePage> {
     if (isGoToNextPage) {
       // isConnectPeripheralSuccess = false;
       isSelected = false;
-      _navigateAndDisplaySelection(context);
+      deviceListPageBackResult(context);
     }
     return res;
   }
@@ -257,13 +258,14 @@ class _HomePageState extends State<HomePage> {
                           {Navigator.pushNamed(context, Routes.updatePage)}
                         else if (i == 4)
                           {
-                            Navigator.pushNamed(
-                              context,
-                              Routes.chargerLinkPage,
-                              arguments: {
-                                "deviceNumber": deviceNumber,
-                              },
-                            )
+                            // Navigator.pushNamed(
+                            //   context,
+                            //   Routes.chargerLinkPage,
+                            //   arguments: {
+                            //     "deviceNumber": deviceNumber,
+                            //   },
+                            // )
+                            chargerLinkPageBackResult(context)
                           }
                         else if (i == 5)
                           {
@@ -671,24 +673,46 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _navigateAndDisplaySelection(BuildContext context) async {
-    final result = await Navigator.push(
+  void deviceListPageBackResult(BuildContext context) async {
+    final deviceListPageResult = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const DeviceListPage()),
     );
     setState(() {
-      if (result == null) {
+      if (deviceListPageResult == null) {
         connectState = "Connect Charger";
         deviceNumber = "";
         isSelectedDevice = false;
       } else {
-        callstartConnectPeripheral(result);
-        deviceNumber = result.toString();
+        callstartConnectPeripheral(deviceListPageResult);
+        deviceNumber = deviceListPageResult.toString();
         isSelectedDevice = true;
         connectionStr = "Connecting...";
         manualConnection = 'Reconnect';
         _connectState(false);
       }
+    });
+  }
+
+  void chargerLinkPageBackResult(BuildContext context) async {
+    final chargerLinkPageResult = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChargerLinkPage(
+                arguments: {
+                  "deviceNumber": deviceNumber,
+                },
+              )),
+    );
+    print(chargerLinkPageResult);
+    if (chargerLinkPageResult == null) {
+      return;
+    }
+    setState(() {
+      isSelectedDevice = true;
+      connectionStr = "Connection Lost";
+      manualConnection = 'Reconnect';
+      _connectState(false);
     });
   }
 }

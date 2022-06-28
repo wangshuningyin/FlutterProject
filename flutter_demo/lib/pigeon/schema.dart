@@ -70,7 +70,9 @@ abstract class CallBluetoothSDK {
   @async
   String getAPNParamsData();
   @async
-  void ceAuthenticationWithParams();
+  void ceAuthenticationWithParams(String authenticationParams);
+  @async
+  bool isCEAuthenticationWithParamsSuccess();
 }
 
 // 原生调用 Flutter 方法1
