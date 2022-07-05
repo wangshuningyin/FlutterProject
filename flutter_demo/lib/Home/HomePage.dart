@@ -16,16 +16,17 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   String version = '';
   bool isSelectedDevice = false;
   Color connectColor = Colors.black;
   String manualConnection = '';
   String connectionStr = '';
-  String bleImageStr = 'lib/images/3.0x/home_ble_select@3x.png';
-  String wifiImageStr = 'lib/images/3.0x/home_wifi_select@3x.png';
-  String lanImageStr = 'lib/images/3.0x/home_lan_select@3x.png';
-  String fourGImageStr = 'lib/images/3.0x/home_4g_select@3x.png';
+  String bleImageStr = 'lib/images/3.0x/home_ble@3x.png';
+  String wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
+  String lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
+  String fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
   String connectImageStr = 'lib/images/3.0x/home_disconnect@3x.png';
   bool isConnectPeripheralSuccess = false;
   String connectState = "Connect Charger";
@@ -36,6 +37,8 @@ class _HomePageState extends State<HomePage> {
   List<YRunStateModel> systemInfoList = [];
   String packageVersion = '';
   String packageCode = '';
+  String networkModelCode = "";
+  String networkingStateResultType = "";
 
   Future<void> callstartConnectPeripheral(String item) async {
     callBluetoothSDK.startConnectPeripheral();
@@ -44,28 +47,90 @@ class _HomePageState extends State<HomePage> {
   }
 
   void delayedConnectPeripheral(String item) {
-    Future.delayed(const Duration(milliseconds: 4000), () {
+    Future.delayed(const Duration(milliseconds: 5500), () {
       callIsConnectPeripheralSuccess(item);
       return Future.value("延时4秒执行");
     });
   }
 
-  Future<bool?> callIsConnectPeripheralSuccess(String item) async {
-    final res = await callBluetoothSDK.isConnectPeripheralSuccess();
-    print('Flutter蓝牙设备连接成功$res');
-    isConnectPeripheralSuccess = res;
+  Future<void> callIsConnectPeripheralSuccess(String item) async {
+    callBluetoothSDK.isConnectPeripheralSuccess().then((value) {
+      print('Flutter蓝牙设备连接成功$value');
+      isConnectPeripheralSuccess = value;
+      if (!value) {
+        connectionStr = "Connection Lost";
+        manualConnection = 'Reconnect';
+        LoadingUtils.showToast("Bluetooth connection failure");
+      } else {
+        callQueryDeviceSystemInfo();
+        setState(() {
+          _connectState(value);
+        });
+        queryNetworkState();
+      }
+    });
+  }
 
-    if (!res) {
-      connectionStr = "Connection Lost";
-      manualConnection = 'Reconnect';
-      LoadingUtils.showToast("Bluetooth connection failure");
-    } else {
-      callQueryDeviceSystemInfo();
-      setState(() {
-        _connectState(res);
-      });
-    }
-    return res;
+  Future<void> queryNetworkState() async {
+    callBluetoothSDK.queryNetworkState();
+    getNetworkingStateData();
+  }
+
+  Future<void> getNetworkingStateData() async {
+    callBluetoothSDK.getNetworkingStateData().then((value) => {
+          print("networkingStateData====$value"),
+          networkingStateResultType = value.substring(0, 1),
+          networkModelCode = value.substring(1),
+          if (networkingStateResultType == "1")
+            {
+              setState(() {
+                wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
+                lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
+                fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
+              })
+            }
+          else if (networkingStateResultType == "0")
+            {
+              if (networkModelCode == "0")
+                {
+                  // typeStr = "Offline";
+                  setState(() {
+                    wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
+                    lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
+                    fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
+                  })
+                }
+              else if (networkModelCode == "1")
+                {
+                  // typeStr = "WiFi";
+                  setState(() {
+                    wifiImageStr = 'lib/images/3.0x/home_wifi_select@3x.png';
+                    lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
+                    fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
+                  })
+                }
+              else if (networkModelCode == "2")
+                {
+                  // typeStr = "LAN";
+
+                  setState(() {
+                    wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
+                    lanImageStr = 'lib/images/3.0x/home_lan_select@3x.png';
+                    fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
+                  })
+                }
+              else if (networkModelCode == "4")
+                {
+                  // typeStr = "4G";
+
+                  setState(() {
+                    wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
+                    lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
+                    fourGImageStr = 'lib/images/3.0x/home_4g_select@3x.png';
+                  })
+                }
+            }
+        });
   }
 
   Future<void> callStartBluetooth() async {
@@ -90,6 +155,15 @@ class _HomePageState extends State<HomePage> {
       // isConnectPeripheralSuccess = false;
       isSelected = false;
       deviceListPageBackResult(context);
+    } else {
+      setState(() {
+        wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
+        lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
+        fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
+        connectionStr = "Connection Lost";
+        manualConnection = 'Reconnect';
+        _connectState(!isSelected);
+      });
     }
     return res;
   }
@@ -124,10 +198,7 @@ class _HomePageState extends State<HomePage> {
       isSelected = !isSelected;
       if (isSelected) {
         print('Flutter2------开始断开蓝牙设备');
-        connectionStr = "Connection Lost";
-        manualConnection = 'Reconnect';
         callStopConnectPeripheral(deviceNumber, false);
-        _connectState(!isSelected);
       } else {
         print('Flutter2------开始连接蓝牙设备');
         callstartConnectPeripheral(deviceNumber);
@@ -144,16 +215,10 @@ class _HomePageState extends State<HomePage> {
       connectionStr = "Connected";
       manualConnection = 'Disconnect';
       bleImageStr = 'lib/images/3.0x/home_ble_select@3x.png';
-      wifiImageStr = 'lib/images/3.0x/home_wifi_select@3x.png';
-      lanImageStr = 'lib/images/3.0x/home_lan_select@3x.png';
-      fourGImageStr = 'lib/images/3.0x/home_4g_select@3x.png';
       connectImageStr = 'lib/images/3.0x/home_disconnect@3x.png';
     } else {
       connectColor = Colors.black;
       bleImageStr = 'lib/images/3.0x/home_ble@3x.png';
-      wifiImageStr = 'lib/images/3.0x/home_wifi@3x.png';
-      lanImageStr = 'lib/images/3.0x/home_lan@3x.png';
-      fourGImageStr = 'lib/images/3.0x/home_4g@3x.png';
       connectImageStr = 'lib/images/3.0x/home_reconnect@3x.png';
     }
   }
@@ -161,7 +226,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
     setState(() {
       if (Platform.isIOS) {
         callStartBluetooth();
@@ -615,7 +679,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: CustomScrollView(
         scrollDirection: Axis.vertical,

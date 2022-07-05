@@ -139,6 +139,9 @@ flutter:
     - lib/images/3.0x/ocpp_process_small_nor@3x.png
     - lib/images/3.0x/ocpp_upload_small_compelete@3x.png
     - lib/images/3.0x/ocpp_upload_small_nor@3x.png
+    - lib/images/3.0x/input_hid@3x.png
+    - lib/images/3.0x/input_show@3x.png
+    - lib/images/3.0x/wifi_config_complete_success@3x.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

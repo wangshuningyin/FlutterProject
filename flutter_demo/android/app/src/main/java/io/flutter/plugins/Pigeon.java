@@ -112,6 +112,10 @@ public class Pigeon {
     void getAPNParamsData(Result<String> result);
     void ceAuthenticationWithParams(String authenticationParams, Result<Void> result);
     void isCEAuthenticationWithParamsSuccess(Result<Boolean> result);
+    void configAPNWithParams(String apnParams, Result<Void> result);
+    void isConfigAPNWithParamsSuccess(Result<Boolean> result);
+    void configWIFIWithSSID(String ssid, String psw, Result<Void> result);
+    void isConfigWIFIWithSSIDSuccess(Result<Boolean> result);
 
     /** The codec used by CallBluetoothSDK. */
     static MessageCodec<Object> getCodec() {
@@ -1058,6 +1062,136 @@ public class Pigeon {
               };
 
               api.isCEAuthenticationWithParamsSuccess(resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.configAPNWithParams", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              ArrayList<Object> args = (ArrayList<Object>)message;
+              String apnParamsArg = (String)args.get(0);
+              if (apnParamsArg == null) {
+                throw new NullPointerException("apnParamsArg unexpectedly null.");
+              }
+              Result<Void> resultCallback = new Result<Void>() {
+                public void success(Void result) {
+                  wrapped.put("result", null);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.configAPNWithParams(apnParamsArg, resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.isConfigAPNWithParamsSuccess", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<Boolean> resultCallback = new Result<Boolean>() {
+                public void success(Boolean result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.isConfigAPNWithParamsSuccess(resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.configWIFIWithSSID", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              ArrayList<Object> args = (ArrayList<Object>)message;
+              String ssidArg = (String)args.get(0);
+              if (ssidArg == null) {
+                throw new NullPointerException("ssidArg unexpectedly null.");
+              }
+              String pswArg = (String)args.get(1);
+              if (pswArg == null) {
+                throw new NullPointerException("pswArg unexpectedly null.");
+              }
+              Result<Void> resultCallback = new Result<Void>() {
+                public void success(Void result) {
+                  wrapped.put("result", null);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.configWIFIWithSSID(ssidArg, pswArg, resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.CallBluetoothSDK.isConfigWIFIWithSSIDSuccess", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<Boolean> resultCallback = new Result<Boolean>() {
+                public void success(Boolean result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.isConfigWIFIWithSSIDSuccess(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

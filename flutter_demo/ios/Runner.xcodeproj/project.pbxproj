@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		4C422E97286D788B00F61BEF /* APNParamsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C422E96286D788B00F61BEF /* APNParamsModel.m */; };
 		4C4E997E27C60FD600BFB8D0 /* CDBleSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C4E997C27C60FCD00BFB8D0 /* CDBleSDK.xcframework */; };
 		4C4E997F27C60FD600BFB8D0 /* CDBleSDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4C4E997C27C60FCD00BFB8D0 /* CDBleSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4C4E998227C6114A00BFB8D0 /* Pigeon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C4E998027C6114A00BFB8D0 /* Pigeon.m */; };
@@ -41,6 +42,8 @@
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		4269C3CB28254252CBBFA84A /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		4C422E95286D788B00F61BEF /* APNParamsModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APNParamsModel.h; sourceTree = "<group>"; };
+		4C422E96286D788B00F61BEF /* APNParamsModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APNParamsModel.m; sourceTree = "<group>"; };
 		4C4E997C27C60FCD00BFB8D0 /* CDBleSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = CDBleSDK.xcframework; sourceTree = "<group>"; };
 		4C4E998027C6114A00BFB8D0 /* Pigeon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pigeon.m; sourceTree = "<group>"; };
 		4C4E998127C6114A00BFB8D0 /* Pigeon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pigeon.h; sourceTree = "<group>"; };
@@ -127,6 +130,8 @@
 				4C4E998427C611EA00BFB8D0 /* PigeonService.m */,
 				4CF4717B286586D80036F5A7 /* NBOcppDomainModel.h */,
 				4CF4717A286586D80036F5A7 /* NBOcppDomainModel.m */,
+				4C422E95286D788B00F61BEF /* APNParamsModel.h */,
+				4C422E96286D788B00F61BEF /* APNParamsModel.m */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -306,6 +311,7 @@
 				4C4E998227C6114A00BFB8D0 /* Pigeon.m in Sources */,
 				97C146F31CF9000F007C117D /* main.m in Sources */,
 				4C4E998527C611EA00BFB8D0 /* PigeonService.m in Sources */,
+				4C422E97286D788B00F61BEF /* APNParamsModel.m in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				4CF4717C286586D80036F5A7 /* NBOcppDomainModel.m in Sources */,
 			);

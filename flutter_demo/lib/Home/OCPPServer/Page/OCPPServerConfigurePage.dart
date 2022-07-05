@@ -124,7 +124,7 @@ class _OCPPServerConfigurePageState extends State<OCPPServerConfigurePage>
           identifyAnimationController.forward();
         }
       });
-
+    identifyAnimationController.forward();
     uploadAnimationController = AnimationController(
         duration: const Duration(seconds: 300), vsync: this);
 

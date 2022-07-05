@@ -73,6 +73,14 @@ abstract class CallBluetoothSDK {
   void ceAuthenticationWithParams(String authenticationParams);
   @async
   bool isCEAuthenticationWithParamsSuccess();
+  @async
+  void configAPNWithParams(String apnParams);
+  @async
+  bool isConfigAPNWithParamsSuccess();
+  @async
+  void configWIFIWithSSID(String ssid, String psw);
+  @async
+  bool isConfigWIFIWithSSIDSuccess();
 }
 
 // 原生调用 Flutter 方法1

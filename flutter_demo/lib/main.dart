@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_flutter.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
 import 'package:flutter_demo/Home/Card/CardConfigurePage.dart';
+import 'package:flutter_demo/Home/ChargerLink/APNConfigPage.dart';
+import 'package:flutter_demo/Home/ChargerLink/WiFiInputPage.dart';
+import 'package:flutter_demo/Home/ChargerLink/WiFiSettingPage.dart';
 import 'package:flutter_demo/Home/DeviceMode/DeviceModePage.dart';
 import 'package:flutter_demo/Home/FirmwareInfo/FirmwareInfoPage.dart';
 import 'package:flutter_demo/Home/OCPPServer/Page/OCPPServerConfigurePage.dart';
@@ -87,6 +90,12 @@ class _MyAppState extends State<MyApp> {
         const InputSNManuallyPage(),
     Routes.packageEditPage: (BuildContext context, {arguments}) =>
         PackageEditPage(arguments: arguments),
+    Routes.apnConfigPage: (BuildContext context, {arguments}) =>
+        APNConfigPage(arguments: arguments),
+    Routes.wifiInputPage: (BuildContext context, {arguments}) =>
+        WiFiInputPage(arguments: arguments),
+    Routes.wifiSettingPage: (BuildContext context, {arguments}) =>
+        WiFiSettingPage(arguments: arguments),
   };
   @override
   void initState() {

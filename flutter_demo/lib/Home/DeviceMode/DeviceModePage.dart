@@ -41,6 +41,7 @@ class _DeviceModePageState extends State<DeviceModePage> {
         } else {
           imageName = switchOff;
         }
+        isSelected = value;
       });
       print('Flutter------$value');
     });

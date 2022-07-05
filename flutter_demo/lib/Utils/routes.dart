@@ -21,4 +21,7 @@ class Routes {
   static const String qRViewExample = '/QRViewExample';
   static const String inputSNManuallyPage = '/InputSNManuallyPage';
   static const String packageEditPage = '/PackageEditPage';
+  static const String apnConfigPage = '/APNConfigPage';
+  static const String wifiInputPage = '/WiFiInputPage';
+  static const String wifiSettingPage = '/WiFiSettingPage';
 }

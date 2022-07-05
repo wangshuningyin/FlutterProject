@@ -1,10 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/CrossPlatformApi/api_generated.dart';
+import 'package:flutter_demo/Home/ChargerLink/APNParamsModel.dart';
 import 'package:flutter_demo/Home/DeviceInfo/DeviceInfoModel.dart';
 import 'package:flutter_demo/NetWorkApi/NetWorkApiRequest.dart';
 import 'package:flutter_demo/Utils/LoadingUtils.dart';
+import 'package:flutter_demo/Utils/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChargerLinkPage extends StatefulWidget {
@@ -45,8 +47,11 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
   String networkModelCode = "";
 
   String sessionId = '';
-  String apnParamsData = '';
   String ssid = '';
+  String apnState = "Off";
+  bool isHideAPNState = false;
+  late APNParamsModel apnParamsModel;
+
   Future<void> queryConfigSSIDParams() async {
     callBluetoothSDK.queryConfigSSIDParams();
     delayedGetSSIDParamsData();
@@ -54,9 +59,9 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
   }
 
   void delayedGetSSIDParamsData() {
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       getSSIDParamsData();
-      return Future.value("延时4秒执行");
+      return Future.value("延时1秒执行");
     });
   }
 
@@ -77,18 +82,20 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
   }
 
   void delayedGetAPNParamsData() {
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       getAPNParamsData();
-      return Future.value("延时4秒执行");
+      return Future.value("延时1秒执行");
     });
   }
 
   Future<void> getAPNParamsData() async {
     callBluetoothSDK.getAPNParamsData().then((value) => {
+          print('Flutter数据APNParamsData =$value 功能'),
           setState(() {
-            apnParamsData = value;
+            apnParamsModel = APNParamsModel.fromJson(json.decode(value));
+            apnState = apnParamsModel.apnType == 1 ? "On" : "Off";
+            print(apnParamsModel.apnType);
           }),
-          print('Flutter数据APNParamsData =$value 功能')
         });
   }
 
@@ -158,14 +165,13 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
               LoadingUtils.showToast("Set Failed");
             }
           }),
-          print('Flutter数据APNParamsData =$value 功能')
         });
   }
 
   Future<void> callStopConnectPeripheral() async {
     callBluetoothSDK.stopConnectPeripheral();
     delayedStopConnectPeripheral();
-    print('Flutter2------开始连接蓝牙设备');
+    print('Flutter2------开始断开蓝牙连接');
   }
 
   void delayedStopConnectPeripheral() {
@@ -193,9 +199,6 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
       _getSessionId().then((value) {
         _getDevice(widget.arguments['deviceNumber']);
       });
-      queryNetworkState();
-      queryConfigSSIDParams();
-      queryConfigAPNParams();
     }
   }
 
@@ -304,6 +307,7 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
 
     NetWorkApiRequest.getDevice(sessionId, parameter).then((value) async {
       if (value != null && value['code'] == 0) {
+        queryNetworkState();
         setState(() {
           List data = [];
           String str = json.encode(value);
@@ -311,6 +315,7 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
           var netModule = ocppServerModel.data.list.first.netModule;
 
           if (netModule.contains("WIFI")) {
+            queryConfigSSIDParams();
             data.add("Wi-Fi");
             setState(() {
               wifiOffstage = false;
@@ -322,6 +327,7 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
             });
           }
           if (netModule.contains("4G")) {
+            queryConfigAPNParams();
             data.add("4G");
             setState(() {
               fourGOffstage = false;
@@ -414,6 +420,17 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
                 const Expanded(
                   child: Text(''), // 中间用Expanded控件
                 ),
+                Offstage(
+                  offstage: isHideAPNState =
+                      networkStateTxt == "Wi-Fi" ? true : false,
+                  child: Text(
+                    apnState,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
                 SizedBox(
                   width: 40,
                   height: 25,
@@ -421,9 +438,22 @@ class _ChargerLinkPageState extends State<ChargerLinkPage> {
                   child: InkWell(
                     onTap: () {
                       if (networkStateTxt == wifiStr) {
-                        print("设置网络");
+                        Navigator.pushNamed(
+                          context,
+                          Routes.wifiInputPage,
+                          arguments: {
+                            "ssid": ssid,
+                            "deviceNumber": widget.arguments['deviceNumber'],
+                          },
+                        );
                       } else if (networkStateTxt == fourGIStr) {
-                        print("设置4g");
+                        Navigator.pushNamed(
+                          context,
+                          Routes.apnConfigPage,
+                          arguments: {
+                            "apnParamsModel": apnParamsModel,
+                          },
+                        );
                       }
                     },
                     child: const Icon(

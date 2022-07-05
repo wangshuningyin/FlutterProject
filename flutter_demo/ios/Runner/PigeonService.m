@@ -7,6 +7,7 @@
 
 #import "PigeonService.h"
 #import "NBOcppDomainModel.h"
+#import "APNParamsModel.h"
 
 #define kOcppDir @"ocppDir"
 
@@ -252,7 +253,6 @@ static NSString * const FunctionSupportOffline      =  @"Offline";
     [[CDBleManager shareManager] requestOCPPConfigParams:paramsModel error:^(NSError * _Nullable error) {
     }];
 }
-
 - (void)isRequestOCPPConfigParamsSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
     NSNumber* isRequestOCPPConfigParamsSuccess = [NSNumber numberWithBool:self.isRequestOCPPConfigParamsSuccess];
     completion(isRequestOCPPConfigParamsSuccess,nil);
@@ -266,9 +266,35 @@ static NSString * const FunctionSupportOffline      =  @"Offline";
     [[CDBleManager shareManager] queryConfigAPNParamsWithError:^(NSError * _Nullable error) {
     }];
 }
-
 - (void)getAPNParamsDataWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion {
     completion(self.apnParamsData,nil);
+}
+
+/**
+ * APN 配置 4G模块TCP/IP参数
+ * 0xDE
+ */
+- (void)configAPNWithParamsApnParams:(nullable NSString *)apnParams completion:(nonnull void (^)(FlutterError * _Nullable))completion {
+    NSDictionary* data = [self dictionaryWithJsonString:apnParams];
+    APNParamsModel* apnParamsModel = [[APNParamsModel alloc] initWithDict:data];
+    CDBleAPNParamsModel *bleAPNParamsModel = [[CDBleAPNParamsModel alloc] init];
+    apnParamsModel.apnType = 1;
+    bleAPNParamsModel.apn = apnParamsModel.apn;
+    bleAPNParamsModel.apnLen = apnParamsModel.apnLen;
+    bleAPNParamsModel.userName = apnParamsModel.userName;
+    bleAPNParamsModel.userNameLen = apnParamsModel.userNameLen;
+    bleAPNParamsModel.psw = apnParamsModel.psw;
+    bleAPNParamsModel.pswLen = apnParamsModel.pswLen;
+    bleAPNParamsModel.imsi = apnParamsModel.imsi;
+    bleAPNParamsModel.imei = apnParamsModel.imei;
+    bleAPNParamsModel.csq = apnParamsModel.csq;
+    [[CDBleManager shareManager] configAPNWithParams:bleAPNParamsModel error:^(NSError * _Nullable error) {
+    }];
+}
+- (void)isConfigAPNWithParamsSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
+    NSNumber* isConfigAPNWithParamsSuccess = [NSNumber numberWithBool:self.isConfigAPNWithParamsSuccess];
+    NSLog(@"iOS: self.isConfigAPNWithParamsSuccess === %@",isConfigAPNWithParamsSuccess);
+    completion(isConfigAPNWithParamsSuccess, nil);
 }
 
 /**
@@ -279,8 +305,6 @@ static NSString * const FunctionSupportOffline      =  @"Offline";
         
     }];
 }
-
-
 - (void)getSSIDParamsDataWithCompletion:(nonnull void (^)(NSString * _Nullable, FlutterError * _Nullable))completion { 
     completion(self.ssid,nil);
 }
@@ -324,11 +348,21 @@ static NSString * const FunctionSupportOffline      =  @"Offline";
     }];
     
 }
-
 - (void)isCEAuthenticationWithParamsSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
     NSNumber* isCEAuthenticationSucces = [NSNumber numberWithBool:self.isCEAuthenticationSucces];
+    NSLog(@"iOS: self.isCEAuthenticationSucces === %@",isCEAuthenticationSucces);
     completion(isCEAuthenticationSucces,nil);
-    NSLog(@"iOS: self.isCEAuthenticationSucces === %d",self.isCEAuthenticationSucces);
+}
+
+- (void)configWIFIWithSSIDSsid:(nullable NSString *)ssid psw:(nullable NSString *)psw completion:(nonnull void (^)(FlutterError * _Nullable))completion {
+    [[CDBleManager shareManager] configWIFIWithSSID:ssid psw:psw error:^(NSError * _Nullable error) {
+    }];
+}
+
+- (void)isConfigWIFIWithSSIDSuccessWithCompletion:(nonnull void (^)(NSNumber * _Nullable, FlutterError * _Nullable))completion {
+    NSNumber* isConfigWIFIWithSSIDSuccess = [NSNumber numberWithBool:self.isConfigWIFIWithSSIDSuccess];
+    NSLog(@"iOS: self.isConfigWIFIWithSSIDSuccess === %@",isConfigWIFIWithSSIDSuccess);
+    completion(isConfigWIFIWithSSIDSuccess,nil);
 }
 
 #pragma mark -- CDBleManagerDelegate
@@ -421,16 +455,30 @@ static NSString * const FunctionSupportOffline      =  @"Offline";
                 self.isCEAuthenticationSucces = YES;
                 NSLog(@"CDBleCmdTypeCEAuthentication请求成功");
             }else if (dataModel.apnParamsModel){
-                NSLog(@"apnParamsModel请求成功 %@, %ld",dataModel.apnParamsModel.imsi, dataModel.apnParamsModel.apnType);
-                self.apnParamsData = [NSString stringWithFormat:@"%ld,%@",dataModel.apnParamsModel.apnType, dataModel.apnParamsModel.imsi];
+                NSDictionary *dic = [dataModel.apnParamsModel dictionaryWithValuesForKeys:@[@"apnType",@"apnLen",@"apn",@"userNameLen",@"userName",@"pswLen",@"psw",@"imei",@"imsi",@"csq"]];
+                NSLog(@"iOS: +++++++++++++%@",dic);
+                self.apnParamsData = [self dictionaryToJson:dic];
+                NSLog(@"apnParamsModel请求成功 %@",self.apnParamsData);
             }else if (dataModel.ssidModel){
                 NSLog(@"ssidModel请求成功%@",dataModel.ssidModel.ssid);
                 self.ssid = dataModel.ssidModel.ssid;
+            }else if(dataModel.cmdType == CDBleCmdTypeConfigAPN){
+                self.isConfigAPNWithParamsSuccess = YES;
+                NSLog(@"APN 配置 4G模块TCP/IP参数成功");
+            }else if (dataModel.cmdType == CDBleCmdTypeConfigBluetoothWIFI) {
+                self.isConfigWIFIWithSSIDSuccess = YES;
+                NSLog(@"配置WIFI成功");
             }
         }else{
             if (dataModel.cmdType == CDBleCmdTypeCEAuthentication){
+                self.isCEAuthenticationSucces = NO;
                 NSLog(@"CDBleCmdTypeCEAuthentication请求失败");
-                self.isCEAuthenticationSucces = YES;
+            }else if(dataModel.cmdType == CDBleCmdTypeConfigAPN){
+                self.isConfigAPNWithParamsSuccess = NO;
+                NSLog(@"APN 配置 4G模块TCP/IP参数失败");
+            }else if (dataModel.cmdType == CDBleCmdTypeConfigBluetoothWIFI) {
+                self.isConfigWIFIWithSSIDSuccess = NO;
+                NSLog(@"配置WIFI失败");
             }
         }
     }

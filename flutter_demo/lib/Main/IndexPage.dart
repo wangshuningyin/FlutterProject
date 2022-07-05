@@ -9,19 +9,20 @@ class Indexpage extends StatefulWidget {
 }
 
 class _IndexpageState extends State<Indexpage> {
-  List taBodies = [const HomePage(title: 'Home'), const PersonalCenterPage()];
+  List<Widget> taBodies = [
+    const HomePage(title: 'Home'),
+    const PersonalCenterPage()
+  ];
   int currentIndex = 0;
-  var currentPage;
-
+  //创建页面控制器
+  late PageController _pageController;
   @override
   void initState() {
     super.initState();
-    currentPage = taBodies[currentIndex];
+    _pageController = PageController(initialPage: currentIndex);
   }
 
   List<BottomNavigationBarItem> bottomtabs = [
-    // BottomNavigationBarItem(icon: Icon(CupertinoIcons.home), label: "首页"),
-    // BottomNavigationBarItem(icon: Icon(CupertinoIcons.person), label: "我的"),
     BottomNavigationBarItem(
       icon: Image.asset(
         "lib/images/2.0x/home_normal@2x.png",
@@ -65,12 +66,16 @@ class _IndexpageState extends State<Indexpage> {
         onTap: (index) {
           setState(() {
             currentIndex = index;
-            currentPage = taBodies[currentIndex];
+            // _pageController = taBodies[currentIndex];
+            _pageController.jumpToPage(index);
             print(currentIndex);
           });
         },
       ),
-      body: currentPage,
+      body: PageView(
+        controller: _pageController,
+        children: taBodies,
+      ),
     );
   }
 }

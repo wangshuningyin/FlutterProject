@@ -192,13 +192,11 @@ class _UserLoginPageState extends State<UserLoginPage> {
             children: [
               Expanded(
                 flex: 3,
-                child: Container(
-                  child: Image.asset(
-                    "lib/images/3.0x/nebual_logo@3x.png",
-                    fit: BoxFit.scaleDown,
-                    width: 173,
-                    height: 38,
-                  ),
+                child: Image.asset(
+                  "lib/images/3.0x/nebual_logo@3x.png",
+                  fit: BoxFit.scaleDown,
+                  width: 173,
+                  height: 38,
                 ),
               ),
               Expanded(
